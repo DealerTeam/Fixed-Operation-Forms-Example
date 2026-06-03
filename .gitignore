@@ -1,0 +1,16 @@
+# Salesforce DX
+.sfdx/
+.localdevserver/
+.sf/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Working drafts / reference copies (not for publication)
+temp/

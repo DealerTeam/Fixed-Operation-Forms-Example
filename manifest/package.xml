@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>FixedOpsFormUtil</members>
+        <members>FixedOpsFormUtilTest</members>
+        <members>FormServiceTechnicianHardCardExt</members>
+        <members>FormServiceTechnicianHardCardExtTest</members>
+        <members>FormPurchaseOrderExt</members>
+        <members>FormPurchaseOrderExtTest</members>
+        <members>FormServiceRepairOrderCustomerCopyExt</members>
+        <members>FormServiceRepairOrderCustomerCopyTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>form_ServiceTechnicianHardCard</members>
+        <members>form_PurchaseOrderVendorCopy</members>
+        <members>form_PurchaseOrderAccountingCopy</members>
+        <members>form_ServiceRepairOrderCustomerCopy</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>FormCompanyLogo</members>
+        <name>ContentAsset</name>
+    </types>
+    <types>
+        <members>forms_FixedOperations</members>
+        <name>PermissionSet</name>
+    </types>
+    <version>66.0</version>
+</Package>

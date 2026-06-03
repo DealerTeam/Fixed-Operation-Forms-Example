@@ -1,0 +1,9 @@
+# LWC configuration files
+**/jsconfig.json
+**/.eslintrc.json
+
+# Local tooling
+.sfdx/
+.localdevserver/
+.vscode/
+.DS_Store

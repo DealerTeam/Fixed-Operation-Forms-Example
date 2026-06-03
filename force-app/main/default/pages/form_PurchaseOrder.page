@@ -1,0 +1,329 @@
+<apex:page standardController="dealer__Purchase_Order__c"
+           extensions="FormPurchaseOrderExt"
+           showHeader="false"
+           sidebar="false"
+           renderAs="{!renderAs}"
+           standardStylesheets="false"
+           applyHtmlTag="false"
+           cache="false">
+  <head>
+    <style type="text/css">
+    body {
+        font-family: Tahoma, Geneva, sans-serif;
+        font-size: 12px;
+    }
+
+    td {
+        font-family: Tahoma, Geneva, sans-serif;
+        padding: 5px;
+    }
+    th {
+        font-family: Tahoma, Geneva, sans-serif;
+        text-align: left;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .evenRow {
+        background-color: #f2f2f2;
+    }
+
+    .oddRow {
+        background-color: #ffffff;
+    }
+
+    .sectionTitle {
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 8px;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 0.25in;
+
+        @bottom-center {
+            white-space: nowrap;
+            padding-right: 0px;
+            font-size: 12px;
+            content: "Printed:&nbsp;
+            <apex:outputText value="{!todayDateOnly}"></apex:outputText>";
+        }
+
+        @bottom-left-corner {
+            padding-left: 25px;
+            padding-right: 0px;
+            text-align: right;
+            white-space: nowrap;
+            font-size: 12px;
+            content: "Printed By:&nbsp; <apex:outputText value="{!printedByName}"/>";
+        }
+
+        @bottom-right {
+            white-space: nowrap;
+            font-size: 12px;
+            content: "Page " counter(page) " of " counter(pages);
+        }
+    }
+    </style>
+  </head>
+
+<body>
+
+<table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td width="500px" valign="top">
+                <div id="orgDetails" class="plEve">
+                    <apex:outputText rendered="{!ISBLANK(dlr.Name)}">
+                        <apex:outputText value="{!$Organization.Name}" style="font-size:18px;font-weight:bold;" />
+                        <br />
+                        <apex:outputText value="{!$Organization.Street}" />
+                        <br />
+                        <apex:outputText value="{!$Organization.City}" />,&nbsp;
+                        <apex:outputText value="{!$Organization.State}" />&nbsp;
+                        <apex:outputText value="{!$Organization.PostalCode}" />
+                    </apex:outputText>
+
+                    <apex:outputText rendered="{!NOT(ISBLANK(dlr.Name))}">
+                        <apex:outputText value="{!dlr.Name}" style="font-size:18px;font-weight:bold;" />
+                        <br />
+                        <apex:outputText value="{!dlr.dealer__Street__c}" />
+                        <br />
+                        <apex:outputText value="{!dlr.dealer__City__c}" />&nbsp;
+                        <apex:outputText value="{!dlr.dealer__State__c}" />&nbsp;
+                        <apex:outputText value="{!dlr.dealer__Postal_Code__c}" />
+                        <br />
+                        <apex:outputText value="{!dlr.dealer__Website__c}" />
+                        <br />
+                        <apex:outputField value="{!dlr.dealer__Main_Phone__c}" />
+                    </apex:outputText>
+                </div>
+            </td>
+            <td width="500px">
+                <div style="float:right;">
+                    <apex:image id="businessLogo"
+                                url="{!logoUrl}"
+                                rendered="{!hasLogo}"
+                                style="height: 80px; width: auto;" />
+                </div>
+                <div style="clear:both"></div>
+                <div style="float:right;">
+                    <table cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td colspan="2" align="center">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td width="175px" class="pLT">PO#</td>
+                            <td class="pLV" align="right">
+                                <apex:outputText value="{!po.dealer__PO_Number__c}" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="175px" class="pLT">Purchase Order Date</td>
+                            <td class="pLV" align="right">
+                                <apex:outputText value="{!poDateOnly}"></apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="175px" class="pLT">
+                                <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Service_Repair_Order__c))}">Repair Order</apex:outputText>
+                            </td>
+                            <td class="pLV" align="right">
+                                <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Service_Repair_Order__c))}" value="{!po.dealer__Service_Repair_Order__r.Name}"></apex:outputText>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="525px" valign="top" colspan="2">
+                <div id="customerNameBlock">
+                    <div style="font-weight:bold;">Purchase Order</div>
+                    <div id="CustomerName">
+                        <apex:outputText value="{!po.dealer__Vendor_Name__c}" />
+                    </div>
+                    <div id="AccountNumber">
+                        <apex:outputText value="{!po.dealer__AccountNumber__c}" />
+                    </div>
+                    <div id="CustomerStreet">
+                        <apex:outputText value="{!po.dealer__Vendor_Street__c}" />
+                    </div>
+                    <div id="CustomerCityStateZip">
+                        <apex:outputText value="{!po.dealer__Vendor_City__c}" />
+                        <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Vendor_City__c))}">,</apex:outputText>&nbsp;
+                        <apex:outputText value="{!po.dealer__Vendor_State__c}" />&nbsp;
+                        <apex:outputText value="{!po.dealer__Vendor_Postal_Code__c}" />
+                    </div>
+                    <div id="CustomerPhoneNumber">
+                        <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Vendor_Phone__c))}" value="Phone:{0}">
+                            <apex:param value="{!po.dealer__Vendor_Phone__c}" />
+                        </apex:outputText>
+                        <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Vendor__c))}" value=" Fax:{0}">
+                            <apex:param value="{!po.dealer__Vendor__r.Fax}" />
+                        </apex:outputText>
+                    </div>
+                    <div id="CustomerInformation" class="plEve" style="font-size:12px;margin-left:455px">
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td width="765px"><apex:outputText>Carrier</apex:outputText></td>
+                                <td><apex:outputText value="{!po.dealer__Carrier__c}"/></td>
+                            </tr>
+                            <tr>
+                                <td><apex:outputText>Shipping Method</apex:outputText></td>
+                                <td><apex:outputText value="{!po.dealer__Shipping_Method__c}"/></td>
+                            </tr>
+                            <tr>
+                                <td><apex:outputText>Tracking#</apex:outputText></td>
+                                <td><apex:outputText value="{!po.dealer__Tracking__c}"/></td>
+                            </tr>
+                            <tr>
+                                <td><apex:outputText>PO Status</apex:outputText></td>
+                                <td><apex:outputText value="{!po.dealer__Status__c}"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+</table>
+<br/><br/><br/>
+
+<table width="100%" border="0" cellpadding="4" cellspacing="0" style="fs-table-paginate: paginate;">
+    <th scope="col" style="border-left: 1px solid #000000;border-top: 1px solid #000000; border-bottom: 1px solid #000000;">QTY</th>
+    <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">Item</th>
+    <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">Description</th>
+    <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">Unit Total</th>
+    <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;border-right: 1px solid #000000;">Extend Cost</th>
+    <apex:variable var="count" value="{!0}"/>
+    <apex:repeat value="{!purchaseLineList}" var="l" id="partsList">
+        <tr class="{!IF(mod(count, 2) == 0, 'evenRow', 'oddRow')}">
+            <td style="border-left: 1px solid #000000; border-bottom: 1px solid #000000;">
+                <apex:outputText value="{0, number, 0}" rendered="{!NOT(ISBLANK(l.partQuantity))}">
+                    <apex:param value="{!l.partQuantity}" />
+                </apex:outputText>
+            </td>
+            <td style="border-bottom: 1px solid #000000;">
+                <table>
+                    <tr><td><apex:outputText value="{!l.partName}" /></td></tr>
+                    <tr><td></td></tr>
+                    <tr><td></td></tr>
+                    <tr><td><apex:outputText value="Special Notes" rendered="{!NOT(ISBLANK(l.specialInstructions))}"/></td></tr>
+                </table>
+            </td>
+            <td style="border-bottom: 1px solid #000000;">
+                <table>
+                    <tr><td><apex:outputText value="{!l.firstLine}" rendered="{!NOT(ISBLANK(l.firstLine))}" /></td></tr>
+                    <tr><td><apex:outputText value="Serial Number: " rendered="{!NOT(ISBLANK(l.serialNumber))}" /><apex:outputText value="{!l.serialNumber}" rendered="{!NOT(ISBLANK(l.serialNumber))}"/></td></tr>
+                    <tr><td><apex:outputText value="{!l.secondLine}" rendered="{!NOT(ISBLANK(l.secondLine))}" /></td></tr>
+                    <tr style="{! IF(ISBLANK(l.specialInstructions), 'display:none', 'display:block') }"><td>{!l.specialInstructions}</td></tr>
+                </table>
+            </td>
+            <td style="border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!currencyCode}" />
+                <apex:outputText value="{0,number, ###,##0.00}">
+                    <apex:param value="{!l.partCost}" />
+                </apex:outputText>
+            </td>
+            <td style="border-right: 1px solid #000000;border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!currencyCode}" />
+                <apex:outputText value="{0,number, ###,##0.00}">
+                    <apex:param value="{!l.partAmount}" />
+                </apex:outputText>
+            </td>
+        </tr>
+        <apex:variable var="count" value="{!count + 1}"/>
+    </apex:repeat>
+    <apex:repeat value="{!miscLines}" var="misc">
+        <tr class="{!IF(mod(count, 2) == 0, 'evenRow', 'oddRow')}">
+            <td style="border-left: 1px solid #000000; border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!misc.dealer__Part_Quantity__c}"></apex:outputText>
+            </td>
+            <td style="border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!misc.dealer__Description__c}"></apex:outputText>
+            </td>
+            <td style="border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!misc.dealer__Special_Instructions__c}"></apex:outputText>
+            </td>
+            <td style="border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!currencyCode}" />
+                <apex:outputText value="{0,number, ###,##0.00}">
+                    <apex:param value="{!misc.dealer__Amount__c}" />
+                </apex:outputText>
+            </td>
+            <td style="border-right: 1px solid #000000;border-bottom: 1px solid #000000;">
+                <apex:outputText value="{!currencyCode}" />
+                <apex:outputText value="{0,number, ###,##0.00}">
+                    <apex:param value="{!misc.dealer__Amount__c}" />
+                </apex:outputText>
+            </td>
+        </tr>
+        <apex:variable var="count" value="{!count + 1}"/>
+    </apex:repeat>
+</table>
+
+<apex:outputPanel rendered="{!hasReceivingLines}">
+    <div class="sectionTitle">Receiving</div>
+    <table width="100%" border="0" cellpadding="4" cellspacing="0" style="fs-table-paginate: paginate;">
+        <th scope="col" style="border-left: 1px solid #000000;border-top: 1px solid #000000; border-bottom: 1px solid #000000;">Receiving #</th>
+        <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">PO Line</th>
+        <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;">Qty Received</th>
+        <th scope="col" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000;border-right: 1px solid #000000;">Amount</th>
+        <apex:variable var="recvCount" value="{!0}"/>
+        <apex:repeat value="{!receivedEventLine}" var="recv" id="receivingList">
+            <tr class="{!IF(mod(recvCount, 2) == 0, 'evenRow', 'oddRow')}">
+                <td style="border-left: 1px solid #000000; border-bottom: 1px solid #000000;">
+                    <apex:outputText value="{!recv.dealer__PurchaseOrderReceivingHeader__r.Name}" />
+                </td>
+                <td style="border-bottom: 1px solid #000000;">
+                    <apex:outputText value="{!recv.dealer__PurchaseOrderLine__r.Name}" />
+                </td>
+                <td style="border-bottom: 1px solid #000000;">
+                    <apex:outputText value="{0, number, 0}" rendered="{!NOT(ISBLANK(recv.dealer__QuantityReceived__c))}">
+                        <apex:param value="{!recv.dealer__QuantityReceived__c}" />
+                    </apex:outputText>
+                </td>
+                <td style="border-right: 1px solid #000000;border-bottom: 1px solid #000000;">
+                    <apex:outputText value="{!currencyCode}" />
+                    <apex:outputText value="{0,number, ###,##0.00}">
+                        <apex:param value="{!recv.dealer__Amount__c}" />
+                    </apex:outputText>
+                </td>
+            </tr>
+            <apex:variable var="recvCount" value="{!recvCount + 1}"/>
+        </apex:repeat>
+    </table>
+</apex:outputPanel>
+
+<table width="100%" style="margin-top:25px;fs-table-paginate: paginate;">
+    <tr>
+        <td width="75%">&nbsp;</td>
+        <td width="25%">
+            <table cellpadding="4" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                <tr>
+                    <td><b><apex:outputText value="Misc Charges Total:" /></b></td>
+                    <td style="text-align: right;">
+                        <apex:outputText value="{!currencyCode}" />
+                        <apex:outputText value="{!miscTotal}"></apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b><apex:outputText value="Parts Total:" /></b></td>
+                    <td style="text-align: right;">
+                        <apex:outputText value="{!currencyCode}" />
+                        <apex:outputText value="{!partTotal}"></apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b><apex:outputText value="Purchase Order Total:" /></b></td>
+                    <td style="text-align: right;">
+                        <apex:outputText value="{!currencyCode}" />
+                        <apex:outputText value="{!po.dealer__TotalOrder__c}"></apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</apex:page>
