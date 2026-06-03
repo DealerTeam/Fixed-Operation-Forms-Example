@@ -6,7 +6,7 @@ Unmanaged Visualforce PDF forms for [DealerTeam DMS](https://www.dealerteam.com/
 
 Click the button to deploy directly into your org (sandbox or production). The deploy runs the included Apex tests.
 
-<a href="https://githubsfdeploy.herokuapp.com?owner=dealerteam&repo=Fixed-Operation-Forms-Example&ref=master">
+<a href="https://githubsfdeploy.herokuapp.com?owner=DealerTeam&repo=Fixed-Operation-Forms-Example&ref=master">
   <img alt="Deploy to Salesforce" src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
