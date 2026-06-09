@@ -1,0 +1,1003 @@
+<apex:page standardController="dealer__Service_Repair_Order__c"
+           extensions="FormServiceRepairOrderAuditCopyExt"
+           id="ServiceROAuditCopy"
+           showHeader="false"
+           sidebar="false"
+           renderAs="{!renderAs}"
+           standardStylesheets="false"
+           applyHtmlTag="false"
+           applyBodyTag="false"
+           cache="false">
+<head>
+<style type="text/css">
+    body {
+        font-family: Tahoma, Geneva, sans-serif;
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
+    }
+    td, th {
+        font-family: Tahoma, Geneva, sans-serif;
+        padding: 5px;
+    }
+    th {
+        text-align: left;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+    table {
+        width: 100%;
+    }
+
+    .cGrey { color: #666; }
+    .cGreyI { color: #666; font-style: italic; }
+    .bBottom { border-bottom: 1px solid #999; }
+    .bTop    { border-top: 1px solid #999; }
+    .bLeft   { border-left: 1px solid #999; }
+    .bRight  { border-right: 1px solid #999; }
+    .neg { color: #b30000; }
+
+    .headerBlock {
+        border: 1px solid #999;
+        border-collapse: collapse;
+        margin-bottom: 6px;
+        table-layout: fixed;
+    }
+    .headerBlock td, .headerBlock th {
+        padding: 3px 6px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+    .headerTitle {
+        background-color: #f0f0f0;
+        font-weight: bold;
+        font-size: 18px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #999;
+        padding: 6px;
+    }
+    .dealerName {
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .serviceHours {
+        margin-top: 6px;
+        font-size: 9px;
+        line-height: 1.3;
+        color: #333;
+    }
+    .serviceHoursTitle {
+        font-weight: bold;
+        color: #666;
+        text-transform: uppercase;
+        font-size: 9px;
+    }
+    .sectionHeader {
+        background-color: #f0f0f0;
+        color: #000;
+        padding: 6px;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    .infoTable {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .infoTable td {
+        border: 1px solid #ccc;
+        padding: 3px 6px;
+    }
+    .infoLabel {
+        background-color: #f5f5f5;
+        color: #666;
+        font-weight: bold;
+        white-space: nowrap;
+        width: 90px;
+    }
+    .infoValueBold {
+        font-weight: bold;
+        font-size: 12px;
+    }
+    .amountRow td {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+    }
+    .amountRow td.infoLabel {
+        background-color: #666;
+        color: #fff;
+    }
+    .contactLabel {
+        color: #666;
+        font-weight: bold;
+        white-space: nowrap;
+        width: 55px;
+        border-bottom: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        padding: 2px 6px;
+    }
+    .contactValue {
+        border-bottom: 1px solid #ccc;
+        padding: 2px 6px;
+    }
+    .vehicleTable {
+        border: none;
+    }
+    .vehicleTable td {
+        font-size: 11px;
+    }
+
+    .job-line-block {
+        page-break-inside: avoid;
+        margin-bottom: 8px;
+        border: 1px solid #999;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    .job-line-block td, .job-line-block th {
+        padding: 3px 6px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+    .jobHeader td {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+    }
+    .jobDescLabel {
+        color: #666;
+        font-style: italic;
+        text-align: left;
+        white-space: nowrap;
+        width: 80px;
+    }
+    .detailTable {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .detailTable th {
+        color: #666;
+        font-style: italic;
+        font-weight: normal;
+        font-size: 10px;
+        border-bottom: 1px solid #ccc;
+        padding: 2px 4px;
+    }
+    .detailTable td {
+        padding: 2px 4px;
+        font-size: 11px;
+        border-bottom: 1px solid #eee;
+    }
+    .alignRight { text-align: right; white-space: nowrap; }
+    .alignCenter { text-align: center; }
+
+    .subtotalRow td {
+        border-top: 1px solid #ccc;
+        text-align: right;
+        white-space: nowrap;
+    }
+    .subtotalLabel {
+        text-align: right;
+        color: #666;
+    }
+    .lineTotalRow td {
+        background-color: #eee;
+        font-weight: bold;
+        text-align: right;
+        white-space: nowrap;
+        border-top: 1px solid #999;
+    }
+
+    /* Line summary / subtotal rows rendered as their own full-width
+       grid so each amount sits in a dedicated column (no overlap). */
+    .lineSummary {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    .lineSummary td {
+        padding: 2px 6px;
+        font-size: 11px;
+        border-top: 1px solid #ccc;
+    }
+    .lineSummary .lsLabel {
+        text-align: right;
+        color: #666;
+    }
+    .lineSummary .lsVal {
+        text-align: right;
+        white-space: nowrap;
+    }
+    .lineSummary .lsCap {
+        color: #999;
+        padding-right: 3px;
+    }
+    .lineSummary.lineTotal td {
+        background-color: #eee;
+        font-weight: bold;
+        border-top: 1px solid #999;
+    }
+    .lineSummary.lineTotal .lsLabel { color: #000; }
+
+    .summaryWrapper {
+        margin-top: 14px;
+    }
+    .summaryBlock {
+        page-break-inside: avoid;
+    }
+
+    .totalsTable {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .totalsTable td, .totalsTable th {
+        border: 1px solid #ccc;
+        padding: 4px 6px;
+    }
+    .totalsTable th {
+        background-color: #666;
+        color: #fff;
+        text-align: right;
+        font-size: 11px;
+    }
+    .totalsLabel {
+        color: #666;
+        font-weight: bold;
+        background-color: #f5f5f5;
+    }
+    .totalsValue {
+        text-align: right;
+        white-space: nowrap;
+    }
+    .grandTotalLabel {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    .grandTotalValue {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+        font-size: 13px;
+        text-align: right;
+    }
+    .summaryTitle {
+        font-weight: bold;
+        font-size: 12px;
+        margin-bottom: 4px;
+        color: #333;
+    }
+
+    .glTable {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 6px;
+    }
+    .glTable th {
+        background-color: #666;
+        color: #fff;
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+    .glTable td {
+        border-bottom: 1px solid #ccc;
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+    .glTotalRow td {
+        background-color: #eee;
+        font-weight: bold;
+        border-top: 1px solid #999;
+    }
+
+    .paymentsTable {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 14px;
+    }
+    .paymentsTable th {
+        background-color: #666;
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+    .paymentsTable td {
+        border-bottom: 1px solid #ccc;
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+    .evenRow { background-color: #f2f2f2; }
+    .oddRow  { background-color: #ffffff; }
+
+    .commentsBlock {
+        border: 1px solid #999;
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 14px;
+    }
+    .commentsBlock td {
+        border: 1px solid #ccc;
+        padding: 4px 6px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+
+    @page {
+        size: portrait;
+        margin: 0.25in;
+
+        @bottom-left {
+            white-space: nowrap;
+            font-size: 10px;
+            content: "RO#:&nbsp; <apex:outputText value="{!ro.dealer__RO_Number__c}"/>";
+        }
+        @bottom-center {
+            white-space: nowrap;
+            font-size: 10px;
+            content: "Printed By:&nbsp; <apex:outputText value="{!printedByName}"/>&nbsp;&#8212;&nbsp;<apex:outputText value="{!printDateTime}"/>";
+        }
+        @bottom-right {
+            white-space: nowrap;
+            font-size: 10px;
+            content: "Page " counter(page) " of " counter(pages);
+        }
+    }
+
+    .page-number:before { content: counter(page); }
+    .page-count:before { content: counter(pages); }
+    .pageFooter {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        font-size: 10px;
+        padding: 5px;
+        text-align: center;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<table cellpadding="0" cellspacing="0" class="headerBlock">
+    <tr>
+        <td colspan="3" class="headerTitle">Service Repair Order - Audit Copy</td>
+    </tr>
+    <tr>
+        <td align="left" valign="top" class="bRight" style="width:110px; padding:4px;">
+            <apex:outputPanel layout="none" rendered="{!hasLogo}">
+                <apex:image id="businessLogo" url="{!logoUrl}" style="height: 80px; width: auto;" alt="Company Logo" />
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!hasServiceHours}">
+                <div class="serviceHours">
+                    <div class="serviceHoursTitle">Service Hours</div>
+                    <apex:repeat value="{!serviceHoursLines}" var="shLine">
+                        <div><apex:outputText value="{!shLine}" /></div>
+                    </apex:repeat>
+                </div>
+            </apex:outputPanel>
+        </td>
+        <td valign="top">
+            <div id="orgDetails">
+                <apex:outputPanel layout="none" rendered="{!ISBLANK(userLoc.Name)}">
+                    <span class="dealerName"><apex:outputText value="{!$Organization.Name}" /></span><br />
+                    <apex:outputText value="{!$Organization.Street}" /><br />
+                    <apex:outputText value="{!$Organization.City}" />,&nbsp;<apex:outputText value="{!$Organization.State}" />&nbsp;<apex:outputText value="{!$Organization.PostalCode}" />
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.Name))}">
+                    <span class="dealerName"><apex:outputText value="{!userLoc.Name}" /></span><br />
+                    <apex:outputText value="{!userLoc.dealer__Street__c}" /><br />
+                    <apex:outputText value="{!userLoc.dealer__City__c}" />,&nbsp;<apex:outputText value="{!userLoc.dealer__State__c}" />&nbsp;<apex:outputText value="{!userLoc.dealer__Postal_Code__c}" /><br />
+                    <apex:outputText value="{!userLoc.dealer__Website__c}" />
+                    <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.dealer__Main_Phone__c))}">
+                        <br /><span class="cGrey">Service Phone:</span>&nbsp;<apex:outputText value="{!userLoc.dealer__Main_Phone__c}" />
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </div>
+        </td>
+        <td valign="top" class="bLeft" style="width:42%;">
+            <table cellpadding="0" cellspacing="0" class="infoTable">
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__RO_Number__c.Label}</td>
+                    <td class="infoValueBold"><apex:outputText value="{!ro.dealer__RO_Number__c}" /></td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.CreatedDate.Label}</td>
+                    <td>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}" rendered="{!NOT(ISBLANK(ro.CreatedDate))}">
+                            <apex:param value="{!ro.CreatedDate}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Invoiced_Date_Time__c.Label}</td>
+                    <td>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}" rendered="{!NOT(ISBLANK(ro.dealer__Invoiced_Date_Time__c))}">
+                            <apex:param value="{!ro.dealer__Invoiced_Date_Time__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Posted_Date_Time__c.Label}</td>
+                    <td>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}" rendered="{!NOT(ISBLANK(ro.dealer__Posted_Date_Time__c))}">
+                            <apex:param value="{!ro.dealer__Posted_Date_Time__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Status__c.Label}</td>
+                    <td><apex:outputText value="{!ro.dealer__Status__c}" /></td>
+                </tr>
+                <tr class="amountRow">
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Total_Repair_Order_Charges__c.Label}</td>
+                    <td class="alignRight">
+                        <apex:outputText value="{!currencyCode}" /><apex:outputText value="{0,number, #,###,##0.00}">
+                            <apex:param value="{!invoiceTotal}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3" class="sectionHeader bTop" style="font-size:12px; padding:3px 6px;">Customer</td>
+    </tr>
+    <tr>
+        <td valign="top" colspan="2">
+            <div id="customerNameBlock">
+                <div id="CustomerName" style="font-weight:bold;"><apex:outputText value="{!customerName}" /></div>
+                <apex:outputText value="{!customerStreet}" /><br />
+                <apex:outputText value="{!customerCity}" /><apex:outputText rendered="{!NOT(ISBLANK(customerCity))}">,</apex:outputText>&nbsp;
+                <apex:outputText value="{!customerState}" />&nbsp;
+                <apex:outputText value="{!customerPostalCode}" />
+            </div>
+        </td>
+        <td valign="top" class="bLeft">
+            <table cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                <tr>
+                    <td class="contactLabel">Account #</td>
+                    <td class="contactValue"><apex:outputText value="{!customerAccountNumber}" /></td>
+                </tr>
+                <tr>
+                    <td class="contactLabel">Phone</td>
+                    <td class="contactValue"><apex:outputText value="{!customerPhone}" /></td>
+                </tr>
+                <tr>
+                    <td class="contactLabel">Mobile</td>
+                    <td class="contactValue"><apex:outputText value="{!customerMobile}" /></td>
+                </tr>
+                <tr>
+                    <td class="contactLabel">Email</td>
+                    <td class="contactValue"><apex:outputText value="{!customerEmail}" /></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3" class="sectionHeader bTop" style="font-size:12px; padding:3px 6px;">Vehicle</td>
+    </tr>
+    <tr>
+        <td colspan="3" style="padding:0;">
+            <table cellpadding="0" cellspacing="0" class="infoTable vehicleTable" width="100%">
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Vehicle__c.Fields.dealer__Year__c.Label}</td>
+                    <td><apex:outputText value="{!ro.dealer__Vehicle__r.dealer__Year__c}" /></td>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Vehicle__c.Fields.dealer__Make__c.Label}</td>
+                    <td><apex:outputText value="{!ro.dealer__Vehicle__r.dealer__Make__c}" /></td>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Vehicle__c.Fields.dealer__Carline__c.Label}</td>
+                    <td><apex:outputText value="{!ro.dealer__Vehicle__r.dealer__Carline__c}" /></td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Vehicle__c.Fields.dealer__VIN__c.Label}</td>
+                    <td colspan="3"><apex:outputText value="{!ro.dealer__Vehicle__r.dealer__VIN__c}" /></td>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Vehicle__c.Fields.dealer__Licence__c.Label}</td>
+                    <td><apex:outputText value="{!ro.dealer__Vehicle__r.dealer__Licence__c}" /></td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Mileage_In__c.Label}</td>
+                    <td>
+                        <apex:outputText value="{0, number, #,###,###}">
+                            <apex:param value="{!ro.dealer__Mileage_In__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Mileage_Out__c.Label}</td>
+                    <td>
+                        <apex:outputText value="{0, number, #,###,###}">
+                            <apex:param value="{!ro.dealer__Mileage_Out__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td class="infoLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Service_Advisor__c.Label}</td>
+                    <td><apex:outputText value="{!ro.dealer__Service_Advisor__r.Name}" /></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<!-- Service Contracts -->
+<apex:outputPanel layout="none" rendered="{!hasServiceContracts}">
+<table cellpadding="0" cellspacing="0" class="headerBlock">
+    <tr>
+        <td class="sectionHeader" style="font-size:12px; padding:3px 6px;">Service Contracts</td>
+    </tr>
+    <tr>
+        <td style="padding:0;">
+            <table cellpadding="0" cellspacing="0" class="infoTable vehicleTable" width="100%">
+                <tr>
+                    <td class="infoLabel" style="width:auto;">{!$ObjectType.dealer__Service_Contract__c.Fields.dealer__Type__c.Label}</td>
+                    <td class="infoLabel" style="width:auto;">{!$ObjectType.dealer__Service_Contract__c.Fields.dealer__Description__c.Label}</td>
+                    <td class="infoLabel alignRight" style="width:auto;">{!$ObjectType.dealer__Service_Contract__c.Fields.dealer__Deductable__c.Label}</td>
+                    <td class="infoLabel alignRight" style="width:auto;">{!$ObjectType.dealer__Service_Contract__c.Fields.dealer__Expiration_Months__c.Label}</td>
+                    <td class="infoLabel alignRight" style="width:auto;">{!$ObjectType.dealer__Service_Contract__c.Fields.dealer__Expiration_Mileage__c.Label}</td>
+                    <td class="infoLabel alignRight" style="width:auto;">{!$ObjectType.dealer__Service_Contract__c.Fields.dealer__End_Date__c.Label}</td>
+                </tr>
+                <apex:repeat value="{!serviceContracts}" var="sc">
+                    <tr>
+                        <td><apex:outputText value="{!sc.dealer__Type__c}" /></td>
+                        <td><apex:outputText value="{!sc.dealer__Description__c}" /></td>
+                        <td class="alignRight">
+                            <apex:outputText rendered="{!NOT(ISBLANK(sc.dealer__Deductable__c))}"><apex:outputText value="{!currencyCode}" /><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!sc.dealer__Deductable__c}" /></apex:outputText></apex:outputText>
+                        </td>
+                        <td class="alignRight">
+                            <apex:outputText value="{0, number, #,###,##0}"><apex:param value="{!sc.dealer__Expiration_Months__c}" /></apex:outputText>
+                        </td>
+                        <td class="alignRight">
+                            <apex:outputText value="{0, number, #,###,##0}"><apex:param value="{!sc.dealer__Expiration_Mileage__c}" /></apex:outputText>
+                        </td>
+                        <td class="alignRight">
+                            <apex:outputText value="{0, date, MM/dd/yyyy}" rendered="{!NOT(ISBLANK(sc.dealer__End_Date__c))}"><apex:param value="{!sc.dealer__End_Date__c}" /></apex:outputText>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </td>
+    </tr>
+</table>
+</apex:outputPanel>
+
+<div style="height: 4px"></div>
+<div class="sectionHeader" style="margin-bottom:4px; padding:3px 6px; font-size:12px;"><b>Description of Service</b></div>
+
+<!-- Job Lines -->
+<apex:repeat value="{!jobs}" var="j">
+    <table cellpadding="0" cellspacing="0" class="job-line-block">
+        <colgroup>
+            <col style="width:70px;" />
+            <col />
+            <col style="width:110px;" />
+        </colgroup>
+        <!-- Job header -->
+        <tr class="jobHeader">
+            <td colspan="2">
+                Job#&nbsp;<apex:outputText value="{0, number, ###,##0}"><apex:param value="{!j.lineNumber}" /></apex:outputText>&nbsp;
+                <apex:outputText value="{!j.opCode}" />
+                <apex:outputText rendered="{!NOT(ISBLANK(j.technicianName))}">&nbsp;&#8212;&nbsp;Tech: <apex:outputText value="{!j.technicianName}" /></apex:outputText>
+            </td>
+            <td class="alignRight"><apex:outputText value="{!j.laborType}" /></td>
+        </tr>
+
+        <!-- Concern / Cause / Correction -->
+        <tr>
+            <td class="jobDescLabel">Concern:</td>
+            <td colspan="2"><apex:outputText escape="true" value="{!j.customerConcern}" /></td>
+        </tr>
+        <apex:outputPanel layout="none" rendered="{!j.hasCause}">
+            <tr>
+                <td class="jobDescLabel">Cause:</td>
+                <td colspan="2"><apex:outputText escape="true" value="{!j.causeExtended}" /></td>
+            </tr>
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!j.hasCorrection}">
+            <tr>
+                <td class="jobDescLabel">Correction:</td>
+                <td colspan="2"><apex:outputText escape="true" value="{!j.correction}" /></td>
+            </tr>
+        </apex:outputPanel>
+
+        <!-- Labor cost / sale / gross -->
+        <tr>
+            <td colspan="3" style="padding:0;">
+                <table cellpadding="0" cellspacing="0" class="detailTable">
+                    <tr>
+                        <th style="width:55%;">{!$ObjectType.dealer__Service_Job__c.Fields.dealer__Labor_Charges__c.Label}</th>
+                        <th style="width:15%;" class="alignRight">{!$ObjectType.dealer__Service_Job__c.Fields.dealer__Technician_Cost__c.Label}</th>
+                        <th style="width:15%;" class="alignRight">Sale</th>
+                        <th style="width:15%;" class="alignRight">Gross</th>
+                    </tr>
+                    <tr>
+                        <td>Labor</td>
+                        <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.laborCost}" /></apex:outputText></td>
+                        <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.laborSale}" /></apex:outputText></td>
+                        <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.laborGross}" /></apex:outputText></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Parts -->
+        <apex:outputPanel layout="none" rendered="{!j.hasParts}">
+            <tr>
+                <td colspan="3" style="padding:0;">
+                    <table cellpadding="0" cellspacing="0" class="detailTable">
+                        <tr>
+                            <th style="width:6%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Quantity_Sold__c.Label}</th>
+                            <th style="width:16%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Part_Number__c.Label}</th>
+                            <th style="width:30%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Part_Description__c.Label}</th>
+                            <th style="width:6%;" class="alignCenter">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Pay_Type__c.Label}</th>
+                            <th style="width:10%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Cost__c.Label}</th>
+                            <th style="width:10%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Extended_Cost__c.Label}</th>
+                            <th style="width:10%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Price__c.Label}</th>
+                            <th style="width:12%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.Fields.dealer__Extended_Price__c.Label}</th>
+                        </tr>
+                        <apex:repeat value="{!j.parts}" var="p">
+                            <tr>
+                                <td><apex:outputText value="{0, number, ###,##0}"><apex:param value="{!p.quantitySold}" /></apex:outputText></td>
+                                <td><apex:outputText value="{!p.partNumber}" /></td>
+                                <td><apex:outputText value="{!p.partDescription}" /></td>
+                                <td class="alignCenter"><apex:outputText value="{!p.payType}" /></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!p.unitCost}" /></apex:outputText></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!p.extendedCost}" /></apex:outputText></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!p.unitPrice}" /></apex:outputText></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!p.extendedPrice}" /></apex:outputText></td>
+                            </tr>
+                        </apex:repeat>
+                        <apex:repeat value="{!j.serialNumbers}" var="sn">
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td colspan="6" class="cGreyI">{!$ObjectType.dealer__Parts_Ledger__c.Fields.dealer__SerialNumber__c.Label}: <apex:outputText value="{!sn}" /></td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding:0;">
+                    <table cellpadding="0" cellspacing="0" class="lineSummary">
+                        <colgroup><col style="width:40%;" /><col style="width:20%;" /><col style="width:20%;" /><col style="width:20%;" /></colgroup>
+                        <tr>
+                            <td class="lsLabel">{!$ObjectType.dealer__Service_Job__c.Fields.dealer__Parts_Total__c.Label}</td>
+                            <td class="lsVal"><span class="lsCap">Cost</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.partsCost}" /></apex:outputText></td>
+                            <td class="lsVal"><span class="lsCap">Sale</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.partsSale}" /></apex:outputText></td>
+                            <td class="lsVal"><span class="lsCap">Gross</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.partsSale - j.partsCost}" /></apex:outputText></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </apex:outputPanel>
+
+        <!-- Miscellaneous -->
+        <apex:outputPanel layout="none" rendered="{!j.hasMisc}">
+            <tr>
+                <td colspan="3" style="padding:0;">
+                    <table cellpadding="0" cellspacing="0" class="detailTable">
+                        <tr>
+                            <th style="width:22%;">{!$ObjectType.dealer__Service_Misc_Charge__c.Fields.dealer__MiscChargeCode__c.Label}</th>
+                            <th style="width:53%;">{!$ObjectType.dealer__Service_Misc_Charge__c.Fields.dealer__Description__c.Label}</th>
+                            <th style="width:12%;" class="alignRight">{!$ObjectType.dealer__Service_Misc_Charge__c.Fields.dealer__Cost__c.Label}</th>
+                            <th style="width:13%;" class="alignRight">{!$ObjectType.dealer__Service_Misc_Charge__c.Fields.dealer__Amount__c.Label}</th>
+                        </tr>
+                        <apex:repeat value="{!j.miscCharges}" var="m">
+                            <tr>
+                                <td><apex:outputText value="{!m.code}" /></td>
+                                <td><apex:outputText value="{!m.description}" /></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!m.cost}" /></apex:outputText></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!m.amount}" /></apex:outputText></td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding:0;">
+                    <table cellpadding="0" cellspacing="0" class="lineSummary">
+                        <colgroup><col style="width:40%;" /><col style="width:20%;" /><col style="width:20%;" /><col style="width:20%;" /></colgroup>
+                        <tr>
+                            <td class="lsLabel">{!$ObjectType.dealer__Service_Job__c.Fields.dealer__Misc_Charges__c.Label}</td>
+                            <td class="lsVal"><span class="lsCap">Cost</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.miscCost}" /></apex:outputText></td>
+                            <td class="lsVal"><span class="lsCap">Sale</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.miscSale}" /></apex:outputText></td>
+                            <td class="lsVal"><span class="lsCap">Gross</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.miscSale - j.miscCost}" /></apex:outputText></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </apex:outputPanel>
+
+        <!-- Sublet purchase order detail -->
+        <apex:outputPanel layout="none" rendered="{!j.hasSublet}">
+            <tr>
+                <td colspan="3" style="padding:0;">
+                    <table cellpadding="0" cellspacing="0" class="detailTable">
+                        <tr>
+                            <th style="width:14%;">{!$ObjectType.dealer__Purchase_Order__c.Fields.dealer__PO_Number__c.Label}</th>
+                            <th style="width:22%;">{!$ObjectType.dealer__Purchase_Order__c.Fields.dealer__Vendor_Name__c.Label}</th>
+                            <th style="width:10%;">{!$ObjectType.dealer__Purchase_Order__c.Fields.dealer__Status__c.Label}</th>
+                            <th style="width:12%;">{!$ObjectType.dealer__Purchase_Order__c.Fields.dealer__Invoice_Number__c.Label}</th>
+                            <th style="width:18%;">{!$ObjectType.dealer__Purchase_Order_Line__c.Fields.dealer__Description__c.Label}</th>
+                            <th style="width:12%;" class="alignRight">{!$ObjectType.dealer__Purchase_Order_Line__c.Fields.dealer__Cost__c.Label}</th>
+                            <th style="width:12%;" class="alignRight">{!$ObjectType.dealer__Purchase_Order_Line__c.Fields.dealer__Customer_Total__c.Label}</th>
+                        </tr>
+                        <apex:repeat value="{!j.sublets}" var="s">
+                            <tr>
+                                <td><apex:outputText value="{!s.poNumber}" /></td>
+                                <td><apex:outputText value="{!s.vendorName}" /></td>
+                                <td><apex:outputText value="{!s.poStatus}" /></td>
+                                <td><apex:outputText value="{!s.invoiceNumber}" /></td>
+                                <td><apex:outputText value="{!s.description}" /></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!s.cost}" /></apex:outputText></td>
+                                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!s.price}" /></apex:outputText></td>
+                            </tr>
+                        </apex:repeat>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="padding:0;">
+                    <table cellpadding="0" cellspacing="0" class="lineSummary">
+                        <colgroup><col style="width:40%;" /><col style="width:20%;" /><col style="width:20%;" /><col style="width:20%;" /></colgroup>
+                        <tr>
+                            <td class="lsLabel">{!$ObjectType.dealer__Service_Job__c.Fields.dealer__Sublet_Total__c.Label}</td>
+                            <td class="lsVal"><span class="lsCap">Cost</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.subletCost}" /></apex:outputText></td>
+                            <td class="lsVal"><span class="lsCap">Sale</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.subletSale}" /></apex:outputText></td>
+                            <td class="lsVal"><span class="lsCap">Gross</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.subletSale - j.subletCost}" /></apex:outputText></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </apex:outputPanel>
+
+        <!-- Line total -->
+        <tr>
+            <td colspan="3" style="padding:0;">
+                <table cellpadding="0" cellspacing="0" class="lineSummary lineTotal">
+                    <colgroup><col style="width:40%;" /><col style="width:20%;" /><col style="width:20%;" /><col style="width:20%;" /></colgroup>
+                    <tr>
+                        <td class="lsLabel">{!$ObjectType.dealer__Service_Job__c.Fields.dealer__Line_Total__c.Label}</td>
+                        <td class="lsVal"><span class="lsCap">Cost</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.lineCost}" /></apex:outputText></td>
+                        <td class="lsVal"><span class="lsCap">Sale</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.lineSale}" /></apex:outputText></td>
+                        <td class="lsVal"><span class="lsCap">Gross</span><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!j.lineGross}" /></apex:outputText></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</apex:repeat>
+
+<!-- Totals: Charges by pay type, then Gross summary stacked below -->
+<div class="summaryWrapper">
+    <div class="summaryBlock" style="width:60%;">
+        <div class="summaryTitle">Charges by Pay Type</div>
+        <table cellpadding="0" cellspacing="0" class="totalsTable">
+            <colgroup><col style="width:28%;" /><col style="width:24%;" /><col style="width:24%;" /><col style="width:24%;" /></colgroup>
+            <tr>
+                <th style="text-align:left; background-color:#666;">&nbsp;</th>
+                <th>Customer</th>
+                <th>Warranty</th>
+                <th>Internal</th>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Labor</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!customerLabor}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!warrantyLabor}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!internalLabor}" /></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Parts</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!customerParts}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!warrantyParts}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!internalParts}" /></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Misc</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!customerMisc}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!warrantyMisc}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!internalMisc}" /></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Sublet</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!customerSublet}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!warrantySublet}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!internalSublet}" /></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="grandTotalLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Customer_Charges__c.Label}</td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!customerCharges}" /></apex:outputText></td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!warrantyCharges}" /></apex:outputText></td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!internalCharges}" /></apex:outputText></td>
+            </tr>
+            <apex:outputPanel layout="none" rendered="{!hasDiscount}">
+                <tr>
+                    <td class="totalsLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Discount_Total__c.Label}</td>
+                    <td class="totalsValue" colspan="3"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!discountTotal}" /></apex:outputText></td>
+                </tr>
+            </apex:outputPanel>
+            <tr>
+                <td class="totalsLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Tax__c.Label}</td>
+                <td class="totalsValue" colspan="3"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!tax}" /></apex:outputText></td>
+            </tr>
+            <tr>
+                <td class="grandTotalLabel">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Customer_Invoice_Total__c.Label}</td>
+                <td class="grandTotalValue" colspan="3">
+                    <apex:outputText value="{!currencyCode}" /><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!customerInvoiceTotal}" /></apex:outputText>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="summaryBlock" style="width:70%; margin-top:14px;">
+        <div class="summaryTitle">Gross Profit Summary</div>
+        <table cellpadding="0" cellspacing="0" class="totalsTable">
+            <colgroup><col style="width:28%;" /><col style="width:18%;" /><col style="width:18%;" /><col style="width:18%;" /><col style="width:18%;" /></colgroup>
+            <tr>
+                <th style="text-align:left; background-color:#666;">&nbsp;</th>
+                <th>Cost</th>
+                <th>Sale</th>
+                <th>Gross</th>
+                <th>Gross %</th>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Labor</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalLaborCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalLaborSale}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalLaborSale - totalLaborCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!laborGrossPercent}" /></apex:outputText>%</td>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Parts</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalPartsCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalPartsSale}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalPartsSale - totalPartsCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!partsGrossPercent}" /></apex:outputText>%</td>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Misc</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalMiscCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalMiscSale}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalMiscSale - totalMiscCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!miscGrossPercent}" /></apex:outputText>%</td>
+            </tr>
+            <tr>
+                <td class="totalsLabel">Sublet</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalSubletCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalSubletSale}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalSubletSale - totalSubletCost}" /></apex:outputText></td>
+                <td class="totalsValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!subletGrossPercent}" /></apex:outputText>%</td>
+            </tr>
+            <tr>
+                <td class="grandTotalLabel">Total</td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalCost}" /></apex:outputText></td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalSale}" /></apex:outputText></td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalGross}" /></apex:outputText></td>
+                <td class="grandTotalValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!grossPercent}" /></apex:outputText>%</td>
+            </tr>
+        </table>
+    </div>
+
+    <apex:repeat value="{!grossByPayType}" var="gp">
+        <apex:outputPanel layout="none" rendered="{!gp.hasData}">
+            <div class="summaryBlock" style="width:70%; margin-top:14px;">
+                <div class="summaryTitle">{!gp.title} Gross Profit</div>
+                <table cellpadding="0" cellspacing="0" class="totalsTable">
+                    <colgroup><col style="width:28%;" /><col style="width:18%;" /><col style="width:18%;" /><col style="width:18%;" /><col style="width:18%;" /></colgroup>
+                    <tr>
+                        <th style="text-align:left; background-color:#666;">&nbsp;</th>
+                        <th>Cost</th>
+                        <th>Sale</th>
+                        <th>Gross</th>
+                        <th>Gross %</th>
+                    </tr>
+                    <apex:repeat value="{!gp.rows}" var="r">
+                        <tr>
+                            <td class="totalsLabel">{!r.label}</td>
+                            <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!r.cost}" /></apex:outputText></td>
+                            <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!r.sale}" /></apex:outputText></td>
+                            <td class="totalsValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!r.gross}" /></apex:outputText></td>
+                            <td class="totalsValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!r.grossPercent}" /></apex:outputText>%</td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <td class="grandTotalLabel">Total</td>
+                        <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!gp.totalCost}" /></apex:outputText></td>
+                        <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!gp.totalSale}" /></apex:outputText></td>
+                        <td class="grandTotalValue"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!gp.totalGross}" /></apex:outputText></td>
+                        <td class="grandTotalValue"><apex:outputText value="{0, number, #,##0.0}"><apex:param value="{!gp.totalGrossPercent}" /></apex:outputText>%</td>
+                    </tr>
+                </table>
+            </div>
+        </apex:outputPanel>
+    </apex:repeat>
+</div>
+
+<!-- Payments -->
+<apex:outputPanel layout="none" rendered="{!hasPayments}">
+    <table cellpadding="0" cellspacing="0" class="paymentsTable">
+        <tr>
+            <th>{!$ObjectType.dealer__Cashering__c.Fields.dealer__Payment_Type__c.Label}</th>
+            <th class="alignCenter">{!$ObjectType.dealer__Cashering__c.Fields.dealer__Deposit__c.Label}</th>
+            <th>{!$ObjectType.dealer__Cashering__c.Fields.dealer__Close_Date__c.Label}</th>
+            <th class="alignRight">{!$ObjectType.dealer__Cashering__c.Fields.dealer__Amount__c.Label}</th>
+            <th class="alignRight">{!$ObjectType.dealer__Cashering__c.Fields.dealer__ProcessingFee__c.Label}</th>
+            <th class="alignRight">Payment Total</th>
+        </tr>
+        <apex:variable var="payIdx" value="{!0}" />
+        <apex:repeat value="{!cashLines}" var="c">
+            <tr class="{!IF(MOD(payIdx, 2) == 0, 'evenRow', 'oddRow')}">
+                <td><apex:outputText value="{!c.paymentMethod}" /></td>
+                <td class="alignCenter"><apex:outputText value="Yes" rendered="{!c.isDeposit}" /></td>
+                <td><apex:outputText value="{0, date, MM/dd/yyyy}"><apex:param value="{!c.closeDate}" /></apex:outputText></td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!c.amount}" /></apex:outputText></td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!c.processingFee}" /></apex:outputText></td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!c.lineTotal}" /></apex:outputText></td>
+            </tr>
+            <apex:variable var="payIdx" value="{!payIdx + 1}" />
+        </apex:repeat>
+        <tr>
+            <td colspan="4">&#160;</td>
+            <td class="alignRight" style="font-weight:bold;">Total Paid:</td>
+            <td class="alignRight" style="font-weight:bold;">
+                <apex:outputText value="{!currencyCode}" /><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalPaid}" /></apex:outputText>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<!-- General Ledger (posted) -->
+<apex:outputPanel layout="none" rendered="{!hasGlLines}">
+    <div style="height: 8px"></div>
+    <div class="sectionHeader" style="margin-bottom:4px; padding:3px 6px; font-size:12px;"><b>General Ledger Detail</b></div>
+    <table cellpadding="0" cellspacing="0" class="glTable">
+        <tr>
+            <th style="width:12%;">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__Account__c.Label}</th>
+            <th style="width:24%;">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__AccountName__c.Label}</th>
+            <th style="width:24%;">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__PostingDescription__c.Label}</th>
+            <th style="width:11%;">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__ControlNumber__c.Label}</th>
+            <th style="width:9%;">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__SaleType__c.Label}</th>
+            <th style="width:10%;">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__AccountingDate__c.Label}</th>
+            <th style="width:10%;" class="alignRight">{!$ObjectType.dealer__GLDetail__x.Fields.dealer__Amount__c.Label}</th>
+        </tr>
+        <apex:variable var="glIdx" value="{!0}" />
+        <apex:repeat value="{!glLines}" var="g">
+            <tr class="{!IF(MOD(glIdx, 2) == 0, 'evenRow', 'oddRow')}">
+                <td><apex:outputText value="{!g.account}" /></td>
+                <td><apex:outputText value="{!g.accountName}" /></td>
+                <td><apex:outputText value="{!g.postingDescription}" /></td>
+                <td><apex:outputText value="{!g.controlNumber}" /></td>
+                <td><apex:outputText value="{!g.saleType}" /></td>
+                <td>
+                    <apex:outputText value="{0, date, MM/dd/yyyy}" rendered="{!NOT(ISBLANK(g.accountingDate))}"><apex:param value="{!g.accountingDate}" /></apex:outputText>
+                </td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!g.amount}" /></apex:outputText></td>
+            </tr>
+            <apex:variable var="glIdx" value="{!glIdx + 1}" />
+        </apex:repeat>
+        <tr class="glTotalRow">
+            <td colspan="6" class="alignRight">Net Posted:</td>
+            <td class="alignRight">
+                <apex:outputText value="{!currencyCode}" /><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!glTotal}" /></apex:outputText>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<!-- Comments -->
+<apex:outputPanel layout="none" rendered="{!hasComments}">
+    <table cellpadding="0" cellspacing="0" class="commentsBlock">
+        <tr>
+            <td class="infoLabel" style="width:90px;">{!$ObjectType.dealer__Service_Repair_Order__c.Fields.dealer__Comments__c.Label}</td>
+            <td><apex:outputText value="{!ro.dealer__Comments__c}" /></td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<!-- Footer (HTML preview only; PDF uses @page footer) -->
+<apex:outputPanel layout="none" rendered="{!NOT(isPdf)}">
+    <div class="pageFooter">
+        RO#: {!ro.dealer__RO_Number__c} &#8212; Printed By: {!printedByName} &#8212; {!printDateTime}
+    </div>
+</apex:outputPanel>
+
+</body>
+</apex:page>

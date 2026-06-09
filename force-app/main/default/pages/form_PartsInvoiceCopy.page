@@ -1,0 +1,660 @@
+<apex:page standardController="dealer__Parts_Invoice__c"
+           extensions="FormPartsInvoiceExt"
+           id="PartsInvoiceCopy"
+           showHeader="false"
+           sidebar="false"
+           renderAs="{!renderAs}"
+           standardStylesheets="false"
+           applyHtmlTag="false"
+           applyBodyTag="false"
+           cache="false">
+<head>
+<style type="text/css">
+    body {
+        font-family: Tahoma, Geneva, sans-serif;
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
+    }
+    td, th {
+        font-family: Tahoma, Geneva, sans-serif;
+        padding: 5px;
+    }
+    th {
+        text-align: left;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+    table { width: 100%; }
+
+    .cGrey { color: #666; }
+    .cGreyI { color: #666; font-style: italic; }
+    .bBottom { border-bottom: 1px solid #999; }
+    .bTop { border-top: 1px solid #999; }
+    .bLeft { border-left: 1px solid #999; }
+    .bRight { border-right: 1px solid #999; }
+
+    .headerBlock {
+        border: 1px solid #999;
+        border-collapse: collapse;
+        margin-bottom: 6px;
+        table-layout: fixed;
+    }
+    .headerBlock td, .headerBlock th {
+        padding: 3px 6px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+    .headerTitle {
+        background-color: #f0f0f0;
+        font-weight: bold;
+        font-size: 18px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #999;
+        padding: 6px;
+    }
+    .repairOrderBanner {
+        border: 1px solid #999;
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .repairOrderBanner td {
+        background-color: #f0f0f0;
+        border: 1px solid #999;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    .repairOrderBannerTitle {
+        font-weight: bold;
+        font-size: 13px;
+        text-transform: uppercase;
+    }
+    .dealerName {
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .serviceHours {
+        margin-top: 6px;
+        font-size: 9px;
+        line-height: 1.3;
+        color: #333;
+    }
+    .serviceHoursTitle {
+        font-weight: bold;
+        color: #666;
+        text-transform: uppercase;
+        font-size: 9px;
+    }
+    .infoTable {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    .infoTable td {
+        border: 1px solid #ccc;
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+    .infoLabel {
+        background-color: #f5f5f5;
+        color: #666;
+        font-weight: bold;
+        white-space: nowrap;
+        width: 90px;
+    }
+    .infoValueBold {
+        font-weight: bold;
+        font-size: 12px;
+    }
+    .amountRow td {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+    }
+    .amountRow td.infoLabel {
+        background-color: #666;
+        color: #fff;
+    }
+    .partyTable {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .partyTable td, .partyTable th {
+        border: 1px solid #ccc;
+        padding: 4px 6px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+    .partyTable th {
+        background-color: #f5f5f5;
+        color: #666;
+        width: 33%;
+    }
+    .partyTable th.partyColHalf {
+        width: 50%;
+    }
+    .detailTable {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .detailTable th {
+        background-color: #666;
+        color: #fff;
+        font-size: 10px;
+        padding: 4px 6px;
+        border: 1px solid #999;
+    }
+    .detailTable td {
+        padding: 3px 6px;
+        font-size: 11px;
+        border: 1px solid #ccc;
+        vertical-align: top;
+    }
+    .alignRight { text-align: right; white-space: nowrap; }
+    .alignCenter { text-align: center; }
+
+    .totalsWrapper {
+        margin-top: 10px;
+        page-break-inside: avoid;
+    }
+    .totalsTable {
+        table-layout: fixed;
+        width: 100%;
+        max-width: 280px;
+        border-collapse: collapse;
+        margin-left: auto;
+    }
+    .totalsTable td {
+        border: 1px solid #ccc;
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+    .totalsLabel {
+        color: #666;
+        font-weight: bold;
+        background-color: #f5f5f5;
+    }
+    .totalsValue {
+        text-align: right;
+        white-space: nowrap;
+    }
+    .grandTotalLabel {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+    }
+    .grandTotalValue {
+        background-color: #666;
+        color: #fff;
+        font-weight: bold;
+        text-align: right;
+    }
+
+    .paymentsTable {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 14px;
+    }
+    .paymentsTable th {
+        background-color: #666;
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 6px;
+    }
+    .paymentsTable td {
+        border-bottom: 1px solid #ccc;
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+    .evenRow { background-color: #f2f2f2; }
+    .oddRow  { background-color: #ffffff; }
+
+    .commentsBlock {
+        border: 1px solid #999;
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .commentsBlock td {
+        border: 1px solid #ccc;
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+    .commentsLabel {
+        background-color: #f5f5f5;
+        color: #666;
+        font-weight: bold;
+        white-space: nowrap;
+        width: 90px;
+    }
+
+    .pdf-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        font-size: 8px;
+        padding: 0 0.20in;
+    }
+    .page-number:before { content: counter(page); }
+    .page-count:before { content: counter(pages); }
+
+    @page {
+        size: portrait;
+        margin-top: 0.20in;
+        margin-left: 0.20in;
+        margin-right: 0.20in;
+        margin-bottom: 0.40in;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<table cellpadding="0" cellspacing="0" class="headerBlock">
+    <tr>
+        <td colspan="3" class="headerTitle">
+            <apex:outputText value="{!formTitle}" />
+        </td>
+    </tr>
+    <tr>
+        <td align="left" valign="top" class="bRight" style="width:110px; padding:4px;">
+            <apex:outputPanel layout="none" rendered="{!hasLogo}">
+                <apex:image id="businessLogo" url="{!logoUrl}" style="height: 80px; width: auto;" alt="Company Logo" />
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!hasServiceHours}">
+                <div class="serviceHours">
+                    <div class="serviceHoursTitle">Service Hours</div>
+                    <apex:repeat value="{!serviceHoursLines}" var="shLine">
+                        <div><apex:outputText value="{!shLine}" /></div>
+                    </apex:repeat>
+                </div>
+            </apex:outputPanel>
+        </td>
+        <td valign="top">
+            <div id="orgDetails">
+                <apex:outputPanel layout="none" rendered="{!ISBLANK(userLoc.Name)}">
+                    <span class="dealerName"><apex:outputText value="{!$Organization.Name}" /></span><br />
+                    <apex:outputText value="{!$Organization.Street}" /><br />
+                    <apex:outputText value="{!$Organization.City}" />,&nbsp;<apex:outputText value="{!$Organization.State}" />&nbsp;<apex:outputText value="{!$Organization.PostalCode}" />
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.Name))}">
+                    <span class="dealerName">
+                        <apex:outputText value="{!userLoc.Name}" rendered="{!ISBLANK(userLoc.dealer__Company_Contracting_Name__c)}" />
+                        <apex:outputText value="{!userLoc.dealer__Company_Contracting_Name__c}" rendered="{!NOT(ISBLANK(userLoc.dealer__Company_Contracting_Name__c))}" />
+                    </span><br />
+                    <apex:outputText value="{!userLoc.dealer__Street__c}" /><br />
+                    <apex:outputText value="{!userLoc.dealer__City__c}" />,&nbsp;<apex:outputText value="{!userLoc.dealer__State__c}" />&nbsp;<apex:outputText value="{!userLoc.dealer__Postal_Code__c}" /><br />
+                    <apex:outputText value="{!userLoc.dealer__Website__c}" />
+                    <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.dealer__BAR_Number__c))}">
+                        <br /><span class="cGrey">{!$ObjectType.dealer__Dealer_Location__c.fields.dealer__BAR_Number__c.Label}:</span>&nbsp;<apex:outputText value="{!userLoc.dealer__BAR_Number__c}" />
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.dealer__EPA_Number__c))}">
+                        <br /><span class="cGrey">{!$ObjectType.dealer__Dealer_Location__c.fields.dealer__EPA_Number__c.Label}:</span>&nbsp;<apex:outputText value="{!userLoc.dealer__EPA_Number__c}" />
+                    </apex:outputPanel>
+                    <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.dealer__Main_Phone__c))}">
+                        <br /><span class="cGrey">Service Phone:</span>&nbsp;<apex:outputText value="{!userLoc.dealer__Main_Phone__c}" />
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </div>
+        </td>
+        <td valign="top" class="bLeft" style="width:42%;">
+            <table cellpadding="0" cellspacing="0" class="infoTable">
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.Name.Label}</td>
+                    <td class="infoValueBold"><apex:outputText value="{!invoice.Name}" /></td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.CreatedDate.Label}</td>
+                    <td>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}" rendered="{!NOT(ISBLANK(invoice.CreatedDate))}">
+                            <apex:param value="{!invoice.CreatedDate}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Invoice_Date_Time__c.Label}</td>
+                    <td>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}" rendered="{!NOT(ISBLANK(invoice.dealer__Invoice_Date_Time__c))}">
+                            <apex:param value="{!invoice.dealer__Invoice_Date_Time__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Post_Date_Time__c.Label}</td>
+                    <td>
+                        <apex:outputText value="{0,date,MM/dd/yyyy}" rendered="{!NOT(ISBLANK(invoice.dealer__Post_Date_Time__c))}">
+                            <apex:param value="{!invoice.dealer__Post_Date_Time__c}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Status__c.Label}</td>
+                    <td><apex:outputText value="{!invoice.dealer__Status__c}" /></td>
+                </tr>
+                <apex:outputPanel layout="none" rendered="{!isRepairOrderInvoice}">
+                    <tr>
+                        <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Service_Repair_Order__c.Label}</td>
+                        <td class="infoValueBold"><apex:outputText value="{!repairOrderNumber}" /></td>
+                    </tr>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!hasRmaNumber}">
+                    <tr>
+                        <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__RMA_No__c.Label}</td>
+                        <td class="infoValueBold"><apex:outputText value="{!invoice.dealer__RMA_No__c}" /></td>
+                    </tr>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!showInvoiceTotals}">
+                    <tr class="amountRow">
+                        <td class="infoLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Total_Invoice__c.Label}</td>
+                        <td class="alignRight">
+                            <apex:outputText value="{!currencyCode}" /><apex:outputText value="{0,number, #,###,##0.00}">
+                                <apex:param value="{!invoice.dealer__Total_Invoice__c}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </apex:outputPanel>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<apex:outputPanel layout="none" rendered="{!isRepairOrderInvoice}">
+    <table cellpadding="0" cellspacing="0" class="repairOrderBanner">
+        <tr>
+            <td>
+                <div class="repairOrderBannerTitle">Service Repair Order Parts Detail</div>
+                <div>
+                    Parts listed below are charged to
+                    <apex:outputText value=" Repair Order {!repairOrderNumber}" rendered="{!NOT(ISBLANK(repairOrderNumber))}" />.
+                    Billing totals and payments appear on the Service Repair Order customer invoice.
+                </div>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<apex:outputPanel layout="none" rendered="{!isVendorReturnInvoice}">
+    <table cellpadding="0" cellspacing="0" class="repairOrderBanner">
+        <tr>
+            <td>
+                <div class="repairOrderBannerTitle">Vendor Return Authorization</div>
+                <div>
+                    Return the parts listed below to the vendor.
+                    Include this document with the returned merchandise.
+                </div>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<apex:outputPanel layout="none" rendered="{!isCounterReturnInvoice}">
+    <table cellpadding="0" cellspacing="0" class="repairOrderBanner">
+        <tr>
+            <td>
+                <div class="repairOrderBannerTitle">Counter Return</div>
+                <div>
+                    Customer return of previously purchased parts.
+                    Credit amounts appear below and refunds may be issued through cashiering.
+                </div>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<apex:outputPanel layout="none" rendered="{!isCoreReturnInvoice}">
+    <table cellpadding="0" cellspacing="0" class="repairOrderBanner">
+        <tr>
+            <td>
+                <div class="repairOrderBannerTitle">Core Return</div>
+                <div>
+                    Customer return of a core deposit from a prior purchase.
+                    Core credit amounts appear below and refunds may be issued through cashiering.
+                </div>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<!-- Sold To / Ship To / Counterman -->
+<table cellpadding="0" cellspacing="0" class="partyTable">
+    <tr>
+        <th class="{!IF(showPartyShipToColumn, '', 'partyColHalf')}">
+            <apex:outputText value="{!partyPrimaryLabel}" rendered="{!NOT(ISBLANK(partyPrimaryLabel))}" />
+            <apex:outputText value="{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Customer__c.Label}" rendered="{!ISBLANK(partyPrimaryLabel)}" />
+        </th>
+        <apex:outputPanel layout="none" rendered="{!showPartyShipToColumn}">
+            <th>
+                <apex:outputText value="Ship To" rendered="{!showShipTo}" />
+            </th>
+        </apex:outputPanel>
+        <th class="{!IF(showPartyShipToColumn, '', 'partyColHalf')}">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Counterman__c.Label}</th>
+    </tr>
+    <tr>
+        <td class="{!IF(showPartyShipToColumn, '', 'partyColHalf')}">
+            <div><apex:outputText value="{!customerName}" /></div>
+            <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(customerAccountNumber))}">
+                <div><apex:outputText value="{!customerAccountNumber}" /></div>
+            </apex:outputPanel>
+            <apex:outputPanel layout="none" rendered="{!NOT(customerIsPersonAccount)}">
+                <div><apex:outputText value="{!customerContactName}" /></div>
+            </apex:outputPanel>
+            <div><apex:outputText value="{!customerStreet}" /></div>
+            <div>
+                <apex:outputText value="{!customerCity}" />
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(customerCity))}">,</apex:outputPanel>&nbsp;
+                <apex:outputText value="{!customerState}" />&nbsp;
+                <apex:outputText value="{!customerPostalCode}" />
+            </div>
+        </td>
+        <apex:outputPanel layout="none" rendered="{!showPartyShipToColumn}">
+        <td>
+            <apex:outputPanel layout="none" rendered="{!showShipTo}">
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(customerContactName))}">
+                    <div><apex:outputText value="{!customerContactName}" /></div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!hasStructuredShipTo}">
+                    <div><apex:outputText value="{!shipToStreet}" /></div>
+                    <div>
+                        <apex:outputText value="{!shipToCity}" />
+                        <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(shipToCity))}">,</apex:outputPanel>&nbsp;
+                        <apex:outputText value="{!shipToState}" />&nbsp;
+                        <apex:outputText value="{!shipToPostalCode}" />
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!NOT(hasStructuredShipTo)}">
+                    <div><apex:outputText escape="true" value="{!shipToFreeform}" /></div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(invoice.dealer__Ship_Via__c))}">
+                    <div>
+                        <span class="cGrey">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Ship_Via__c.Label}:</span>&nbsp;
+                        <apex:outputText value="{!invoice.dealer__Ship_Via__c}" />
+                    </div>
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(invoice.dealer__Shipping_Tracking_No__c))}">
+                    <div>
+                        <span class="cGrey">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Shipping_Tracking_No__c.Label}:</span>&nbsp;
+                        <apex:outputText value="{!invoice.dealer__Shipping_Tracking_No__c}" />
+                    </div>
+                </apex:outputPanel>
+            </apex:outputPanel>
+        </td>
+        </apex:outputPanel>
+        <td style="vertical-align:top;" class="{!IF(showPartyShipToColumn, '', 'partyColHalf')}">
+            <apex:outputText value="{!invoice.dealer__Counterman__r.Name}" />
+        </td>
+    </tr>
+</table>
+
+<!-- Comments -->
+<apex:outputPanel layout="none" rendered="{!hasComments}">
+    <table cellpadding="0" cellspacing="0" class="commentsBlock">
+        <tr>
+            <td class="commentsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Comments__c.Label}</td>
+            <td><apex:outputText escape="true" value="{!invoice.dealer__Comments__c}" /></td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<!-- Line items -->
+<table cellpadding="0" cellspacing="0" class="detailTable">
+    <tr>
+        <th style="width:7%;">
+            <apex:outputText value="{!lineQuantityLabel}" rendered="{!NOT(ISBLANK(lineQuantityLabel))}" />
+            <apex:outputText value="{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Quantity_Sold__c.Label}" rendered="{!ISBLANK(lineQuantityLabel)}" />
+        </th>
+        <th style="width:14%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Part_Number__c.Label}</th>
+        <th style="width:24%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Part_Description__c.Label}</th>
+        <apex:outputPanel layout="none" rendered="{!isReturnInvoice}">
+            <th style="width:18%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Comment__c.Label}</th>
+        </apex:outputPanel>
+        <th style="width:10%;">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Bin__c.Label}</th>
+        <th style="width:10%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Price__c.Label}</th>
+        <apex:outputPanel layout="none" rendered="{!showLineCoreColumn}">
+            <th style="width:10%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__TotalCore__c.Label}</th>
+        </apex:outputPanel>
+        <th style="width:12%;" class="alignRight">{!$ObjectType.dealer__Parts_Invoice_Line__c.fields.dealer__Total_Price__c.Label}</th>
+    </tr>
+    <apex:repeat value="{!invoiceLineItems}" var="l">
+        <tr>
+            <td>
+                <apex:outputText value="{0, number, ###,##0}" rendered="{!isReturnInvoice}">
+                    <apex:param value="{!l.quantityReturned}" />
+                </apex:outputText>
+                <apex:outputText value="{0, number, ###,##0}" rendered="{!NOT(isReturnInvoice)}">
+                    <apex:param value="{!l.quantity}" />
+                </apex:outputText>
+            </td>
+            <td><apex:outputText value="{!l.partNumber}" /></td>
+            <td>
+                <apex:outputText value="{!l.displayDescription}" />
+                <apex:outputPanel layout="none" rendered="{!l.hasReturnReference}">
+                    <div class="cGreyI">Original Invoice: <apex:outputText value="{!l.returnReferenceInvoiceName}" /></div>
+                </apex:outputPanel>
+                <apex:repeat value="{!l.serialNumbers}" var="sn">
+                    <div class="cGreyI">{!$ObjectType.dealer__Parts_Ledger__c.fields.dealer__SerialNumber__c.Label}: <apex:outputText value="{!sn}" /></div>
+                </apex:repeat>
+            </td>
+            <apex:outputPanel layout="none" rendered="{!isReturnInvoice}">
+                <td><apex:outputText escape="true" value="{!l.lineComment}" /></td>
+            </apex:outputPanel>
+            <td><apex:outputText value="{!l.binDisplay}" /></td>
+            <td class="alignRight"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!l.unitPrice}" /></apex:outputText></td>
+            <apex:outputPanel layout="none" rendered="{!showLineCoreColumn}">
+                <td class="alignRight"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!l.totalCore}" /></apex:outputText></td>
+            </apex:outputPanel>
+            <td class="alignRight"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!l.totalPrice}" /></apex:outputText></td>
+        </tr>
+    </apex:repeat>
+</table>
+
+<!-- Totals -->
+<apex:outputPanel layout="none" rendered="{!showInvoiceTotals}">
+<div class="totalsWrapper">
+    <table cellpadding="0" cellspacing="0" class="totalsTable">
+        <tr>
+            <td class="totalsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Parts_Price__c.Label}</td>
+            <td class="totalsValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!invoice.dealer__Parts_Price__c}" /></apex:outputText></td>
+        </tr>
+        <tr>
+            <td class="totalsLabel">Total Core Charges</td>
+            <td class="totalsValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!totalCoreCharges}" /></apex:outputText></td>
+        </tr>
+        <tr>
+            <td class="totalsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__TotalMiscCharges__c.Label}</td>
+            <td class="totalsValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!invoice.dealer__TotalMiscCharges__c}" /></apex:outputText></td>
+        </tr>
+        <tr>
+            <td class="totalsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Total_Tax__c.Label}</td>
+            <td class="totalsValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!invoice.dealer__Total_Tax__c}" /></apex:outputText></td>
+        </tr>
+        <apex:outputPanel layout="none" rendered="{!hasSalesTaxId}">
+            <tr>
+                <td class="totalsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Sales_Tax_ID__c.Label}</td>
+                <td class="totalsValue"><apex:outputText value="{!invoice.dealer__Sales_Tax_ID__c}" /></td>
+            </tr>
+        </apex:outputPanel>
+        <tr>
+            <td class="totalsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__TotalPayments__c.Label}</td>
+            <td class="totalsValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!invoice.dealer__TotalPayments__c}" /></apex:outputText></td>
+        </tr>
+        <apex:outputPanel layout="none" rendered="{!hasDeposit}">
+            <tr>
+                <td class="totalsLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Deposit__c.Label}</td>
+                <td class="totalsValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!invoice.dealer__Deposit__c}" /></apex:outputText></td>
+            </tr>
+        </apex:outputPanel>
+        <tr>
+            <td class="grandTotalLabel">{!$ObjectType.dealer__Parts_Invoice__c.fields.dealer__Total_Invoice__c.Label}</td>
+            <td class="grandTotalValue"><apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!invoice.dealer__Total_Invoice__c}" /></apex:outputText></td>
+        </tr>
+        <tr>
+            <td class="totalsLabel">{!totalDueLabel}</td>
+            <td class="totalsValue">
+                <apex:outputText value="{!currencyCode}" />&nbsp;
+                <apex:outputText value="{0, number, ###,##0.00}"><apex:param value="{!totalDue}" /></apex:outputText>
+            </td>
+        </tr>
+    </table>
+</div>
+</apex:outputPanel>
+
+<!-- Payments -->
+<apex:outputPanel layout="none" rendered="{!showPaymentsSection}">
+    <table cellpadding="0" cellspacing="0" class="paymentsTable">
+        <tr>
+            <th>{!$ObjectType.dealer__Cashering__c.Fields.dealer__Payment_Type__c.Label}</th>
+            <th class="alignCenter">{!$ObjectType.dealer__Cashering__c.Fields.dealer__Deposit__c.Label}</th>
+            <th>{!$ObjectType.dealer__Cashering__c.Fields.dealer__Close_Date__c.Label}</th>
+            <th class="alignRight">{!$ObjectType.dealer__Cashering__c.Fields.dealer__Amount__c.Label}</th>
+            <th class="alignRight">{!$ObjectType.dealer__Cashering__c.Fields.dealer__ProcessingFee__c.Label}</th>
+            <th class="alignRight">Payment Total</th>
+        </tr>
+        <apex:variable var="payIdx" value="{!0}" />
+        <apex:repeat value="{!cashLines}" var="c">
+            <tr class="{!IF(MOD(payIdx, 2) == 0, 'evenRow', 'oddRow')}">
+                <td><apex:outputText value="{!c.paymentMethod}" /></td>
+                <td class="alignCenter"><apex:outputText value="Yes" rendered="{!c.isDeposit}" /></td>
+                <td><apex:outputText value="{0, date, MM/dd/yyyy}"><apex:param value="{!c.closeDate}" /></apex:outputText></td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!c.amount}" /></apex:outputText></td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!c.processingFee}" /></apex:outputText></td>
+                <td class="alignRight"><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!c.lineTotal}" /></apex:outputText></td>
+            </tr>
+            <apex:variable var="payIdx" value="{!payIdx + 1}" />
+        </apex:repeat>
+        <tr>
+            <td colspan="4">&#160;</td>
+            <td class="alignRight" style="font-weight:bold;">Total Paid:</td>
+            <td class="alignRight" style="font-weight:bold;">
+                <apex:outputText value="{!currencyCode}" /><apex:outputText value="{0, number, #,###,##0.00}"><apex:param value="{!totalPaid}" /></apex:outputText>
+            </td>
+        </tr>
+    </table>
+</apex:outputPanel>
+
+<!-- Footer -->
+<div class="pdf-footer">
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-size:8px; border-top:1px solid #999;">
+        <tr>
+            <td style="padding-top:3px; line-height:1.2;">
+                <apex:outputPanel layout="none" rendered="{!NOT(ISBLANK(userLoc.dealer__Parts_Invoice_Disclaimer__c))}">
+                    <apex:outputField value="{!userLoc.dealer__Parts_Invoice_Disclaimer__c}" />
+                </apex:outputPanel>
+                <apex:outputPanel layout="none" rendered="{!ISBLANK(userLoc.dealer__Parts_Invoice_Disclaimer__c)}">
+                    No returns on special order items or electronics. No returns after 30 days. 15% restocking fee may apply.
+                </apex:outputPanel>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top:2px; font-size:7px;">
+                Printed By: {!printedByName} {!printDateTime} - Page <span class="page-number"></span> of <span class="page-count"></span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</apex:page>
