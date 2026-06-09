@@ -3,5 +3,5 @@
     <apiVersion>66.0</apiVersion>
     <availableInTouch>false</availableInTouch>
     <confirmationTokenRequired>false</confirmationTokenRequired>
-    <label>form_PartsInvoiceAuditCopy</label>
+    <label>form_PartsInvoiceAccountingCopy</label>
 </ApexPage>

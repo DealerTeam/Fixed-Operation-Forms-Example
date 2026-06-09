@@ -224,8 +224,8 @@
         border-right: 1px solid #000000;
     }
     .colQty { width: 12%; }
-    .colItem { width: 16%; }
-    .colDesc { width: 40%; }
+    .colItem { width: 21%; }
+    .colDesc { width: 35%; }
     .colUnit { width: 16%; }
     .colExtend { width: 16%; }
     .lineTableNoParts .colQty { width: 12%; }
@@ -367,13 +367,13 @@
                     <apex:outputText value="{!po.dealer__AccountNumber__c}" />
                 </div>
                 <div id="CustomerStreet">
-                    <apex:outputText value="{!po.dealer__Vendor_Street__c}" />
+                    <apex:outputText value="{!vendorStreet}" />
                 </div>
                 <div id="CustomerCityStateZip">
-                    <apex:outputText value="{!po.dealer__Vendor_City__c}" />
-                    <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Vendor_City__c))}">,</apex:outputText>&nbsp;
-                    <apex:outputText value="{!po.dealer__Vendor_State__c}" />&nbsp;
-                    <apex:outputText value="{!po.dealer__Vendor_Postal_Code__c}" />
+                    <apex:outputText value="{!vendorCity}" />
+                    <apex:outputText rendered="{!NOT(ISBLANK(vendorCity))}">,</apex:outputText>&nbsp;
+                    <apex:outputText value="{!vendorState}" />&nbsp;
+                    <apex:outputText value="{!vendorPostalCode}" />
                 </div>
                 <div id="CustomerPhoneNumber">
                     <apex:outputText rendered="{!NOT(ISBLANK(po.dealer__Vendor_Phone__c))}" value="{0}: {1}">
@@ -489,7 +489,7 @@
             </td>
             <apex:outputPanel layout="none" rendered="{!isPartPurchase}">
                 <td class="lineCell lineCellItem">
-                    <apex:outputText value="{!l.partName}" rendered="{!NOT(ISBLANK(l.partName))}" />
+                    <apex:outputText value="{!l.partNameDisplay}" rendered="{!NOT(ISBLANK(l.partName))}" />
                 </td>
             </apex:outputPanel>
             <td class="lineCell lineCellDesc">

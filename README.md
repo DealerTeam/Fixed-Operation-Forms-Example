@@ -28,8 +28,8 @@ Pages use Apex controllers and extensions from the DealerTeam managed package (`
 
 | Type | Members |
 | --- | --- |
-| **Apex classes** | `FixedOpsFormUtil`, `FormServiceTechnicianHardCardExt`, `FormPurchaseOrderExt`, `FormPartsInvoiceExt`, `FormPartsInvoiceAuditCopyExt`, `FormServiceRepairOrderCustomerCopyExt` (+ matching test classes) |
-| **Visualforce pages** | `form_ServiceTechnicianHardCard`, `form_PurchaseOrderVendorCopy`, `form_PurchaseOrderAccountingCopy`, `form_PartsInvoiceCopy`, `form_PartsInvoiceAuditCopy`, `form_PartsPickTicketCopy`, `form_ServiceRepairOrderCustomerCopy` |
+| **Apex classes** | `FixedOpsFormUtil`, `FormServiceTechnicianHardCardExt`, `FormPurchaseOrderExt`, `FormPartsInvoiceExt`, `FormPartsInvoiceAccountingCopyExt`, `FormServiceRepairOrderCustomerCopyExt` (+ matching test classes) |
+| **Visualforce pages** | `form_ServiceTechnicianHardCard`, `form_PurchaseOrderVendorCopy`, `form_PurchaseOrderAccountingCopy`, `form_PartsInvoiceCopy`, `form_PartsInvoiceAccountingCopy`, `form_PartsPickTicketCopy`, `form_ServiceRepairOrderCustomerCopy` |
 | **Content asset** | `FormCompanyLogo` (replace with your dealership logo) |
 | **Permission set** | `forms_FixedOperations` (grants access to the pages and Apex) |
 
@@ -68,11 +68,13 @@ This project's pages map to objects as follows:
 | Visualforce page | `dealer__Based_on_Object__c` |
 | --- | --- |
 | `form_ServiceRepairOrderCustomerCopy` | `dealer__Service_Repair_Order__c` |
+| `form_ServiceRepairOrderAuditCopy` | `dealer__Service_Repair_Order__c` |
+| `form_ServiceRepairOrderWarrantyCopy` | `dealer__Service_Repair_Order__c` |
 | `form_ServiceTechnicianHardCard` | `dealer__Service_Repair_Order__c` |
 | `form_PurchaseOrderVendorCopy` | `dealer__Purchase_Order__c` |
 | `form_PurchaseOrderAccountingCopy` | `dealer__Purchase_Order__c` |
 | `form_PartsInvoiceCopy` | `dealer__Parts_Invoice__c` |
-| `form_PartsInvoiceAuditCopy` | `dealer__Parts_Invoice__c` |
+| `form_PartsInvoiceAccountingCopy` | `dealer__Parts_Invoice__c` |
 | `form_PartsPickTicketCopy` | `dealer__Parts_Invoice__c` |
 
 ### Option A — DealerTeam UI
@@ -84,7 +86,7 @@ Follow the DealerTeam Success guides:
 
 ### Option B — Anonymous Apex (all locations at once)
 
-Use the included script to register all forms and assign them to **every** Dealer Location in one pass. It is idempotent: existing Form records (matched by page name) and existing Form/Location assignments are reused instead of duplicated.
+Use the included script to register all forms and assign them to **every** Dealer Location in one pass. Because the print is invoked from a managed (`dealer`) component, the Form's Page Name must carry the local namespace prefix (`c__form_...`). The script deletes any existing Form records for these pages (prefixed or not, along with their location assignments) and reinserts them with the `c__` prefix, so it is safe to re-run.
 
 ```bash
 sf apex run --file scripts/apex/assignFormsToLocations.apex --target-org my-org
@@ -96,18 +98,20 @@ The script (`scripts/apex/assignFormsToLocations.apex`) groups the service (RO) 
 Map<String, String> objectByPage = new Map<String, String>{
     // --- Service Repair Order forms ---
     'form_ServiceRepairOrderCustomerCopy' => 'dealer__Service_Repair_Order__c',
+    'form_ServiceRepairOrderAuditCopy'    => 'dealer__Service_Repair_Order__c',
+    'form_ServiceRepairOrderWarrantyCopy' => 'dealer__Service_Repair_Order__c',
     'form_ServiceTechnicianHardCard'      => 'dealer__Service_Repair_Order__c',
     // --- Purchase Order forms ---
     'form_PurchaseOrderVendorCopy'        => 'dealer__Purchase_Order__c',
     'form_PurchaseOrderAccountingCopy'    => 'dealer__Purchase_Order__c',
     // --- Parts Invoice forms ---
     'form_PartsInvoiceCopy'               => 'dealer__Parts_Invoice__c',
-    'form_PartsInvoiceAuditCopy'          => 'dealer__Parts_Invoice__c',
+    'form_PartsInvoiceAccountingCopy'     => 'dealer__Parts_Invoice__c',
     'form_PartsPickTicketCopy'            => 'dealer__Parts_Invoice__c'
 };
 ```
 
-It then upserts a `dealer__Form__c` per page (Print Type `Laser`, the correct Based-on object, Active) and inserts a `dealer__FormRef__c` for each `dealer__Dealer_Location__c` that doesn't already have one.
+It then inserts a `dealer__Form__c` per page (Page Name `c__form_...`, Print Type `Laser`, the correct Based-on object, a Description ending in "Custom", Active) and a `dealer__FormRef__c` linking each form to every `dealer__Dealer_Location__c`.
 
 ## Project layout
 
@@ -147,7 +151,7 @@ sf project deploy start \
   --tests FormServiceTechnicianHardCardExtTest \
   --tests FormPurchaseOrderExtTest \
   --tests FormPartsInvoiceExtTest \
-  --tests FormPartsInvoiceAuditCopyTest \
+  --tests FormPartsInvoiceAccountingCopyTest \
   --tests FormServiceRepairOrderCustomerCopyTest \
   --wait 10
 ```

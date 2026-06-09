@@ -1,5 +1,5 @@
 @IsTest
-private class FormPartsInvoiceAuditCopyTest {
+private class FormPartsInvoiceAccountingCopyTest {
     @IsTest
     static void extensionInitializesWithoutInvoiceId() {
         ApexPages.StandardController controller = new ApexPages.StandardController(
@@ -7,7 +7,7 @@ private class FormPartsInvoiceAuditCopyTest {
         );
 
         Test.startTest();
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             controller
         );
         Test.stopTest();
@@ -22,7 +22,7 @@ private class FormPartsInvoiceAuditCopyTest {
         System.assertEquals(false, extension.hasPayments);
         System.assertEquals(false, extension.hasGlLines);
         System.assertEquals(true, String.isBlank(extension.userLoc.Name));
-        System.assertEquals('Parts Invoice - Audit Copy', extension.formTitle);
+        System.assertEquals('Parts Invoice - Accounting Copy', extension.formTitle);
     }
 
     @IsTest
@@ -32,14 +32,14 @@ private class FormPartsInvoiceAuditCopyTest {
         );
 
         ApexPages.currentPage().getParameters().put('pdf', 'false');
-        FormPartsInvoiceAuditCopyExt htmlExtension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt htmlExtension = new FormPartsInvoiceAccountingCopyExt(
             controller
         );
         System.assertEquals(false, htmlExtension.isPdf);
         System.assertEquals(null, htmlExtension.renderAs);
 
         ApexPages.currentPage().getParameters().put('pdf', 'true');
-        FormPartsInvoiceAuditCopyExt pdfExtension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt pdfExtension = new FormPartsInvoiceAccountingCopyExt(
             controller
         );
         System.assertEquals(true, pdfExtension.isPdf);
@@ -50,7 +50,7 @@ private class FormPartsInvoiceAuditCopyTest {
     static void resolvePartsInvoiceIdUsesControllerRecordId() {
         Id fakeId = fakePartsInvoiceId();
 
-        Id resolvedId = FormPartsInvoiceAuditCopyExt.resolvePartsInvoiceId(
+        Id resolvedId = FormPartsInvoiceAccountingCopyExt.resolvePartsInvoiceId(
             new ApexPages.StandardController(
                 new dealer__Parts_Invoice__c(Id = fakeId)
             )
@@ -64,7 +64,7 @@ private class FormPartsInvoiceAuditCopyTest {
         Id fakeId = fakePartsInvoiceId();
         ApexPages.currentPage().getParameters().put('id', fakeId);
 
-        Id resolvedId = FormPartsInvoiceAuditCopyExt.resolvePartsInvoiceId(
+        Id resolvedId = FormPartsInvoiceAccountingCopyExt.resolvePartsInvoiceId(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
 
@@ -75,7 +75,7 @@ private class FormPartsInvoiceAuditCopyTest {
     static void resolvePartsInvoiceIdReturnsNullWhenUnavailable() {
         ApexPages.currentPage().getParameters().clear();
 
-        Id resolvedId = FormPartsInvoiceAuditCopyExt.resolvePartsInvoiceId(
+        Id resolvedId = FormPartsInvoiceAccountingCopyExt.resolvePartsInvoiceId(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
 
@@ -87,7 +87,7 @@ private class FormPartsInvoiceAuditCopyTest {
         Id fakeId = fakePartsInvoiceId();
 
         Test.startTest();
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(
                 new dealer__Parts_Invoice__c(Id = fakeId)
             )
@@ -102,7 +102,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void loadPartsInvoiceHandlesMissingRecord() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.loadPartsInvoice(fakePartsInvoiceId());
@@ -115,7 +115,7 @@ private class FormPartsInvoiceAuditCopyTest {
     static void resolveGlReferenceBuildsPiReferenceFromInvoiceFields() {
         System.assertEquals(
             'PI1005',
-            FormPartsInvoiceAuditCopyExt.resolveGlReference(
+            FormPartsInvoiceAccountingCopyExt.resolveGlReference(
                 new dealer__Parts_Invoice__c(
                     Name = 'INV#RD1-1005',
                     dealer__Invoice_Number__c = 'PI1005'
@@ -124,21 +124,21 @@ private class FormPartsInvoiceAuditCopyTest {
         );
         System.assertEquals(
             'PI1005',
-            FormPartsInvoiceAuditCopyExt.resolveGlReference(
+            FormPartsInvoiceAccountingCopyExt.resolveGlReference(
                 new dealer__Parts_Invoice__c(Name = 'INV#RD1-1005')
             )
         );
         System.assertEquals(
             'PI1051',
-            FormPartsInvoiceAuditCopyExt.formatPartsInvoiceGlReference('1051')
+            FormPartsInvoiceAccountingCopyExt.formatPartsInvoiceGlReference('1051')
         );
         System.assertEquals(
             'PI1051',
-            FormPartsInvoiceAuditCopyExt.formatPartsInvoiceGlReference('pi1051')
+            FormPartsInvoiceAccountingCopyExt.formatPartsInvoiceGlReference('pi1051')
         );
         System.assertEquals(
             null,
-            FormPartsInvoiceAuditCopyExt.resolveGlReference(null)
+            FormPartsInvoiceAccountingCopyExt.resolveGlReference(null)
         );
     }
 
@@ -146,17 +146,17 @@ private class FormPartsInvoiceAuditCopyTest {
     static void extractInvoiceNumberParsesDisplayNameSuffix() {
         System.assertEquals(
             '1051',
-            FormPartsInvoiceAuditCopyExt.extractInvoiceNumber('INV#RD1-1051')
+            FormPartsInvoiceAccountingCopyExt.extractInvoiceNumber('INV#RD1-1051')
         );
         System.assertEquals(
             '1005',
-            FormPartsInvoiceAuditCopyExt.extractInvoiceNumber('INV#RD1-1005')
+            FormPartsInvoiceAccountingCopyExt.extractInvoiceNumber('INV#RD1-1005')
         );
-        System.assertEquals(null, FormPartsInvoiceAuditCopyExt.extractInvoiceNumber(null));
+        System.assertEquals(null, FormPartsInvoiceAccountingCopyExt.extractInvoiceNumber(null));
     }
 
     @IsTest
-    static void buildAuditLineWrappersMapsCostAndPriceFields() {
+    static void buildAccountingLineWrappersMapsCostAndPriceFields() {
         dealer__Parts_Invoice_Line__c line = (dealer__Parts_Invoice_Line__c) JSON.deserialize(
             '{' +
             '"dealer__Quantity_Sold__c":2,' +
@@ -178,13 +178,13 @@ private class FormPartsInvoiceAuditCopyTest {
             dealer__Parts_Invoice_Line__c.class
         );
 
-        List<FormPartsInvoiceAuditCopyExt.AuditLineWrapper> wrappers =
-            FormPartsInvoiceAuditCopyExt.buildAuditLineWrappers(
+        List<FormPartsInvoiceAccountingCopyExt.AccountingLineWrapper> wrappers =
+            FormPartsInvoiceAccountingCopyExt.buildAccountingLineWrappers(
                 new List<dealer__Parts_Invoice_Line__c>{ line }
             );
 
         System.assertEquals(1, wrappers.size());
-        FormPartsInvoiceAuditCopyExt.AuditLineWrapper wrapper = wrappers[0];
+        FormPartsInvoiceAccountingCopyExt.AccountingLineWrapper wrapper = wrappers[0];
         System.assertEquals(2, wrapper.quantity);
         System.assertEquals('BRK-1', wrapper.partNumber);
         System.assertEquals('Brake pad', wrapper.displayDescription);
@@ -200,14 +200,14 @@ private class FormPartsInvoiceAuditCopyTest {
     }
 
     @IsTest
-    static void buildAuditLineWrappersHandlesNullAndEmpty() {
+    static void buildAccountingLineWrappersHandlesNullAndEmpty() {
         System.assertEquals(
             0,
-            FormPartsInvoiceAuditCopyExt.buildAuditLineWrappers(null).size()
+            FormPartsInvoiceAccountingCopyExt.buildAccountingLineWrappers(null).size()
         );
         System.assertEquals(
             0,
-            FormPartsInvoiceAuditCopyExt.buildAuditLineWrappers(
+            FormPartsInvoiceAccountingCopyExt.buildAccountingLineWrappers(
                 new List<dealer__Parts_Invoice_Line__c>()
             ).size()
         );
@@ -220,8 +220,8 @@ private class FormPartsInvoiceAuditCopyTest {
             dealer__Cashering__c.class
         );
 
-        List<FormPartsInvoiceAuditCopyExt.CashLineWrapper> lines =
-            FormPartsInvoiceAuditCopyExt.buildCashLines(
+        List<FormPartsInvoiceAccountingCopyExt.CashLineWrapper> lines =
+            FormPartsInvoiceAccountingCopyExt.buildCashLines(
                 new List<dealer__Cashering__c>{ cash }
             );
 
@@ -232,17 +232,17 @@ private class FormPartsInvoiceAuditCopyTest {
         System.assertEquals(125.00, lines[0].amount);
         System.assertEquals(3.50, lines[0].processingFee);
         System.assertEquals(128.50, lines[0].lineTotal);
-        System.assertEquals(0, FormPartsInvoiceAuditCopyExt.buildCashLines(null).size());
+        System.assertEquals(0, FormPartsInvoiceAccountingCopyExt.buildCashLines(null).size());
     }
 
     @IsTest
     static void computeFinancialTotalsRollsUpLineAmountsWhenHeaderFieldsNull() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
 
-        List<FormPartsInvoiceAuditCopyExt.AuditLineWrapper> lines =
-            FormPartsInvoiceAuditCopyExt.buildAuditLineWrappers(
+        List<FormPartsInvoiceAccountingCopyExt.AccountingLineWrapper> lines =
+            FormPartsInvoiceAccountingCopyExt.buildAccountingLineWrappers(
                 new List<dealer__Parts_Invoice_Line__c>{
                     (dealer__Parts_Invoice_Line__c) JSON.deserialize(
                         '{"dealer__Extended_Cost__c":50.00,"dealer__Total_Price__c":60.00,"dealer__TotalCore__c":8.00}',
@@ -265,13 +265,13 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void computePaymentTotalsSumsLineTotals() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
             null,
             null,
-            FormPartsInvoiceAuditCopyExt.buildCashLines(
+            FormPartsInvoiceAccountingCopyExt.buildCashLines(
                 new List<dealer__Cashering__c>{
                     (dealer__Cashering__c) JSON.deserialize(
                         '{"dealer__Amount__c":90.00,"dealer__ProcessingFee__c":10.00}',
@@ -288,7 +288,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void applyShipToDetailsUsesStructuredAddressFields() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
@@ -311,12 +311,12 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void percentCalculationsHandleZeroSale() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
             new dealer__Parts_Invoice__c(),
-            new List<FormPartsInvoiceAuditCopyExt.AuditLineWrapper>(),
+            new List<FormPartsInvoiceAccountingCopyExt.AccountingLineWrapper>(),
             null,
             null
         );
@@ -328,7 +328,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void recordTypeFlagsDriveFormTitleAndLayout() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
 
@@ -341,7 +341,7 @@ private class FormPartsInvoiceAuditCopyTest {
             null
         );
         System.assertEquals(true, extension.isVendorReturnInvoice);
-        System.assertEquals('Vendor Return - Audit Copy', extension.formTitle);
+        System.assertEquals('Vendor Return - Accounting Copy', extension.formTitle);
         System.assertEquals(false, extension.showPartyShipToColumn);
 
         extension.assignTestState(
@@ -355,7 +355,7 @@ private class FormPartsInvoiceAuditCopyTest {
         System.assertEquals(true, extension.isRepairOrderInvoice);
         System.assertEquals(false, extension.showInvoiceTotals);
         System.assertEquals(
-            'Service Repair Order - Parts Invoice Audit Copy',
+            'Service Repair Order - Parts Invoice Accounting Copy',
             extension.formTitle
         );
     }
@@ -371,7 +371,7 @@ private class FormPartsInvoiceAuditCopyTest {
             return;
         }
 
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
 
@@ -394,7 +394,7 @@ private class FormPartsInvoiceAuditCopyTest {
         }
 
         Test.startTest();
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(
                 new dealer__Parts_Invoice__c(Id = invoices[0].Id)
             )
@@ -406,7 +406,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void applyCustomerDetailsMapsFields() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         FixedOpsFormUtil.CustomerDetails details = new FixedOpsFormUtil.CustomerDetails();
@@ -433,7 +433,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void applyCustomerDetailsIgnoresNull() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.applyCustomerDetails(null);
@@ -442,7 +442,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void commentDepositCoreAndDueFlags() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
@@ -451,7 +451,7 @@ private class FormPartsInvoiceAuditCopyTest {
                 dealer__Deposit__c = 25.00,
                 RecordType = new RecordType(DeveloperName = 'Counter_Return')
             ),
-            FormPartsInvoiceAuditCopyExt.buildAuditLineWrappers(
+            FormPartsInvoiceAccountingCopyExt.buildAccountingLineWrappers(
                 new List<dealer__Parts_Invoice_Line__c>{
                     (dealer__Parts_Invoice_Line__c) JSON.deserialize(
                         '{"dealer__TotalCore__c":12.00}',
@@ -468,7 +468,7 @@ private class FormPartsInvoiceAuditCopyTest {
         System.assertEquals(true, extension.hasCoreCharges);
         System.assertEquals(true, extension.isReturnInvoice);
         System.assertEquals('Total Credit', extension.totalDueLabel);
-        System.assertEquals('Counter Return - Audit Copy', extension.formTitle);
+        System.assertEquals('Counter Return - Accounting Copy', extension.formTitle);
     }
 
     @IsTest
@@ -479,8 +479,8 @@ private class FormPartsInvoiceAuditCopyTest {
             dealer__Parts_Invoice_Line__c.class
         );
 
-        FormPartsInvoiceAuditCopyExt.AuditLineWrapper wrapper =
-            new FormPartsInvoiceAuditCopyExt.AuditLineWrapper(line);
+        FormPartsInvoiceAccountingCopyExt.AccountingLineWrapper wrapper =
+            new FormPartsInvoiceAccountingCopyExt.AccountingLineWrapper(line);
 
         System.assertEquals('INV#RD1-1001', wrapper.returnReferenceInvoiceName);
         System.assertEquals(true, wrapper.hasReturnReference);
@@ -488,12 +488,12 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void grossPercentCalculatesFromTotals() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
             new dealer__Parts_Invoice__c(),
-            FormPartsInvoiceAuditCopyExt.buildAuditLineWrappers(
+            FormPartsInvoiceAccountingCopyExt.buildAccountingLineWrappers(
                 new List<dealer__Parts_Invoice_Line__c>{
                     (dealer__Parts_Invoice_Line__c) JSON.deserialize(
                         '{"dealer__Extended_Cost__c":40.00,"dealer__Total_Price__c":100.00,"dealer__TotalCore__c":0}',
@@ -512,7 +512,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void shipToFreeformUsedWhenStructuredAddressMissing() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
@@ -545,7 +545,7 @@ private class FormPartsInvoiceAuditCopyTest {
             return;
         }
 
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
 
@@ -565,7 +565,7 @@ private class FormPartsInvoiceAuditCopyTest {
 
     @IsTest
     static void repairOrderNumberFallsBackToRoNumberField() {
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.assignTestState(
@@ -594,7 +594,7 @@ private class FormPartsInvoiceAuditCopyTest {
             return;
         }
 
-        FormPartsInvoiceAuditCopyExt extension = new FormPartsInvoiceAuditCopyExt(
+        FormPartsInvoiceAccountingCopyExt extension = new FormPartsInvoiceAccountingCopyExt(
             new ApexPages.StandardController(new dealer__Parts_Invoice__c())
         );
         extension.loadPartsInvoice(invoices[0].Id);

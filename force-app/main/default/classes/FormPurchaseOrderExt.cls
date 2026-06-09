@@ -3,6 +3,12 @@
  */
 public with sharing class FormPurchaseOrderExt {
     private static final Integer DESC_SIZE = 40;
+    private static final Integer PART_NAME_WRAP_SIZE = 12;
+    // The PDF renderer cannot break long unbroken strings (e.g. part numbers),
+    // so break opportunities are inserted manually as zero-width spaces.
+    private static final String ZERO_WIDTH_SPACE = String.fromCharArray(
+        new List<Integer>{ 8203 }
+    );
 
     public dealer__Purchase_Order__c po { get; private set; }
     public List<PurchaseOrderLineWrapper> purchaseLineList { get; private set; }
@@ -31,6 +37,11 @@ public with sharing class FormPurchaseOrderExt {
     public String apInboxEmail { get; private set; }
     public String renderAs { get; private set; }
     public Boolean isPdf { get; private set; }
+
+    public String vendorStreet { get; private set; }
+    public String vendorCity { get; private set; }
+    public String vendorState { get; private set; }
+    public String vendorPostalCode { get; private set; }
 
     public dealer__Dealer_Location__c dlr {
         get {
@@ -180,6 +191,44 @@ public with sharing class FormPurchaseOrderExt {
         initializePurchaseOrderLines(po.dealer__Purchase_Order_Line__r);
         loadReceivingLines(purchaseOrderId);
         apInboxEmail = resolveApInboxEmail(dlr);
+        applyVendorAddress(po);
+    }
+
+    /**
+     * Vendor address is sourced from the vendor Account; the PO header copy
+     * is only used as a fallback when the Account has no address on file.
+     */
+    @TestVisible
+    private void applyVendorAddress(dealer__Purchase_Order__c order) {
+        if (order == null) {
+            return;
+        }
+
+        vendorStreet = order.dealer__Vendor_Street__c;
+        vendorCity = order.dealer__Vendor_City__c;
+        vendorState = order.dealer__Vendor_State__c;
+        vendorPostalCode = order.dealer__Vendor_Postal_Code__c;
+
+        FixedOpsFormUtil.CustomerDetails details =
+            FixedOpsFormUtil.resolveCustomerDetailsByAccountId(
+                order.dealer__Vendor__c
+            );
+        if (details == null) {
+            return;
+        }
+
+        Boolean accountHasAddress = String.isNotBlank(details.street) ||
+            String.isNotBlank(details.city) ||
+            String.isNotBlank(details.state) ||
+            String.isNotBlank(details.postalCode);
+        if (!accountHasAddress) {
+            return;
+        }
+
+        vendorStreet = details.street;
+        vendorCity = details.city;
+        vendorState = details.state;
+        vendorPostalCode = details.postalCode;
     }
 
     @TestVisible
@@ -518,6 +567,25 @@ public with sharing class FormPurchaseOrderExt {
     }
 
     @TestVisible
+    private static String softWrap(String value, Integer chunkSize) {
+        if (value == null || chunkSize == null || chunkSize <= 0 ||
+            value.length() <= chunkSize) {
+            return value;
+        }
+
+        List<String> chunks = new List<String>();
+        Integer index = 0;
+        while (index < value.length()) {
+            chunks.add(
+                value.substring(index, Math.min(index + chunkSize, value.length()))
+            );
+            index += chunkSize;
+        }
+
+        return String.join(chunks, ZERO_WIDTH_SPACE);
+    }
+
+    @TestVisible
     private static String formatDetailValue(Object value) {
         if (value == null) {
             return null;
@@ -589,6 +657,11 @@ public with sharing class FormPurchaseOrderExt {
         public String lineDescription { get; set; }
         public Decimal partQuantity { get; set; }
         public String partName { get; set; }
+        public String partNameDisplay {
+            get {
+                return softWrap(partName, PART_NAME_WRAP_SIZE);
+            }
+        }
         public String partDescription { get; set; }
         public Decimal partCost { get; set; }
         public Decimal partAmount { get; set; }

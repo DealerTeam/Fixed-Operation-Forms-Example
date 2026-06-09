@@ -1,6 +1,6 @@
 <apex:page standardController="dealer__Parts_Invoice__c"
-           extensions="FormPartsInvoiceAuditCopyExt"
-           id="PartsInvoiceAuditCopy"
+           extensions="FormPartsInvoiceAccountingCopyExt"
+           id="PartsInvoiceAccountingCopy"
            showHeader="false"
            sidebar="false"
            renderAs="{!renderAs}"
@@ -425,7 +425,7 @@
             <td>
                 <div class="repairOrderBannerTitle">Service Repair Order Parts Detail</div>
                 <div>
-                    Internal audit copy of parts charged to
+                    Internal accounting copy of parts charged to
                     <apex:outputText value=" Repair Order {!repairOrderNumber}" rendered="{!NOT(ISBLANK(repairOrderNumber))}" />.
                 </div>
             </td>
@@ -438,7 +438,7 @@
         <tr>
             <td>
                 <div class="repairOrderBannerTitle">Vendor Return Authorization</div>
-                <div>Internal audit copy of vendor return parts and costs.</div>
+                <div>Internal accounting copy of vendor return parts and costs.</div>
             </td>
         </tr>
     </table>
@@ -449,7 +449,7 @@
         <tr>
             <td>
                 <div class="repairOrderBannerTitle">Counter Return</div>
-                <div>Internal audit copy of customer return with cost and credit detail.</div>
+                <div>Internal accounting copy of customer return with cost and credit detail.</div>
             </td>
         </tr>
     </table>
@@ -460,7 +460,7 @@
         <tr>
             <td>
                 <div class="repairOrderBannerTitle">Core Return</div>
-                <div>Internal audit copy of core return with cost and credit detail.</div>
+                <div>Internal accounting copy of core return with cost and credit detail.</div>
             </td>
         </tr>
     </table>

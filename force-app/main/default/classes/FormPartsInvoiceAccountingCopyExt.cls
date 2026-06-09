@@ -1,13 +1,13 @@
 /**
- * Unmanaged extension for form_PartsInvoiceAuditCopy.
+ * Unmanaged extension for form_PartsInvoiceAccountingCopy.
  *
- * Renders an internal audit copy of a Parts Invoice with cost and sale detail
+ * Renders an internal accounting copy of a Parts Invoice with cost and sale detail
  * on every line, a gross-profit summary, cashiering, and posted General Ledger
  * entries from dealer__GLDetail__x.
  */
-public with sharing class FormPartsInvoiceAuditCopyExt {
+public with sharing class FormPartsInvoiceAccountingCopyExt {
     public dealer__Parts_Invoice__c invoice { get; private set; }
-    public List<AuditLineWrapper> invoiceLineItems { get; private set; }
+    public List<AccountingLineWrapper> invoiceLineItems { get; private set; }
     public List<CashLineWrapper> cashLines { get; private set; }
     public List<FixedOpsFormUtil.GlDetailLine> glLines { get; private set; }
 
@@ -138,18 +138,18 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
     public String formTitle {
         get {
             if (isRepairOrderInvoice) {
-                return 'Service Repair Order - Parts Invoice Audit Copy';
+                return 'Service Repair Order - Parts Invoice Accounting Copy';
             }
             if (isVendorReturnInvoice) {
-                return 'Vendor Return - Audit Copy';
+                return 'Vendor Return - Accounting Copy';
             }
             if (isCounterReturnInvoice) {
-                return 'Counter Return - Audit Copy';
+                return 'Counter Return - Accounting Copy';
             }
             if (isCoreReturnInvoice) {
-                return 'Core Return - Audit Copy';
+                return 'Core Return - Accounting Copy';
             }
-            return 'Parts Invoice - Audit Copy';
+            return 'Parts Invoice - Accounting Copy';
         }
     }
     public String totalDueLabel {
@@ -285,8 +285,8 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
         private set;
     }
 
-    public FormPartsInvoiceAuditCopyExt(ApexPages.StandardController controller) {
-        invoiceLineItems = new List<AuditLineWrapper>();
+    public FormPartsInvoiceAccountingCopyExt(ApexPages.StandardController controller) {
+        invoiceLineItems = new List<AccountingLineWrapper>();
         cashLines = new List<CashLineWrapper>();
         glLines = new List<FixedOpsFormUtil.GlDetailLine>();
         invoice = new dealer__Parts_Invoice__c();
@@ -400,7 +400,7 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
         invoice = invoices[0];
         cashLines = buildCashLines(invoice.dealer__Cashiering__r);
         computePaymentTotals();
-        invoiceLineItems = buildAuditLineWrappers(loadInvoiceLines(invoiceId));
+        invoiceLineItems = buildAccountingLineWrappers(loadInvoiceLines(invoiceId));
         computeFinancialTotals(invoice, invoiceLineItems);
         applyCustomerDetails(
             FixedOpsFormUtil.resolveCustomerDetailsByAccountId(
@@ -519,16 +519,16 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
     }
 
     @TestVisible
-    private static List<AuditLineWrapper> buildAuditLineWrappers(
+    private static List<AccountingLineWrapper> buildAccountingLineWrappers(
         List<dealer__Parts_Invoice_Line__c> lines
     ) {
-        List<AuditLineWrapper> wrappers = new List<AuditLineWrapper>();
+        List<AccountingLineWrapper> wrappers = new List<AccountingLineWrapper>();
         if (lines == null || lines.isEmpty()) {
             return wrappers;
         }
 
         for (dealer__Parts_Invoice_Line__c line : lines) {
-            wrappers.add(new AuditLineWrapper(line));
+            wrappers.add(new AccountingLineWrapper(line));
         }
 
         return wrappers;
@@ -553,14 +553,14 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
     @TestVisible
     private void computeFinancialTotals(
         dealer__Parts_Invoice__c inv,
-        List<AuditLineWrapper> lines
+        List<AccountingLineWrapper> lines
     ) {
         Decimal lineCost = 0;
         Decimal lineSale = 0;
         Decimal lineCore = 0;
 
         if (lines != null) {
-            for (AuditLineWrapper line : lines) {
+            for (AccountingLineWrapper line : lines) {
                 lineCost += zeroIfNull(line.extendedCost);
                 lineSale += zeroIfNull(line.totalPrice);
                 lineCore += zeroIfNull(line.totalCore);
@@ -637,12 +637,12 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
     @TestVisible
     private void assignTestState(
         dealer__Parts_Invoice__c testInvoice,
-        List<AuditLineWrapper> lines,
+        List<AccountingLineWrapper> lines,
         List<CashLineWrapper> cash,
         Decimal due
     ) {
         invoice = testInvoice;
-        invoiceLineItems = lines == null ? new List<AuditLineWrapper>() : lines;
+        invoiceLineItems = lines == null ? new List<AccountingLineWrapper>() : lines;
         cashLines = cash == null ? new List<CashLineWrapper>() : cash;
         totalDue = due == null ? 0 : due;
         computePaymentTotals();
@@ -656,7 +656,7 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
         return value == null ? 0 : value;
     }
 
-    public class AuditLineWrapper {
+    public class AccountingLineWrapper {
         public Decimal quantity { get; private set; }
         public Decimal quantityReturned { get; private set; }
         public String partNumber { get; private set; }
@@ -673,7 +673,7 @@ public with sharing class FormPartsInvoiceAuditCopyExt {
         public Boolean hasReturnReference { get; private set; }
         public List<String> serialNumbers { get; private set; }
 
-        public AuditLineWrapper(dealer__Parts_Invoice_Line__c line) {
+        public AccountingLineWrapper(dealer__Parts_Invoice_Line__c line) {
             quantity = line.dealer__Quantity_Sold__c;
             quantityReturned = line.dealer__QuantityReturned__c;
             partNumber = line.dealer__Part_Number__c;

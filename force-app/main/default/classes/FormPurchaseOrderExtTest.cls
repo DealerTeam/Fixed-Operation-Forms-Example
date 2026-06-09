@@ -51,6 +51,104 @@ private class FormPurchaseOrderExtTest {
     }
 
     @IsTest
+    static void softWrapInsertsBreakOpportunitiesInLongValues() {
+        String zeroWidthSpace = String.fromCharArray(new List<Integer>{ 8203 });
+
+        System.assertEquals(null, FormPurchaseOrderExt.softWrap(null, 12));
+        System.assertEquals('SHORT', FormPurchaseOrderExt.softWrap('SHORT', 12));
+        System.assertEquals('NOCHUNK', FormPurchaseOrderExt.softWrap('NOCHUNK', 0));
+
+        String wrapped = FormPurchaseOrderExt.softWrap('OEM:N1040427506MTR', 12);
+        System.assertEquals(true, wrapped.contains(zeroWidthSpace));
+        System.assertEquals('OEM:N1040427506MTR', wrapped.replace(zeroWidthSpace, ''));
+    }
+
+    @IsTest
+    static void partNameDisplaySoftWrapsLongPartNames() {
+        String zeroWidthSpace = String.fromCharArray(new List<Integer>{ 8203 });
+        FormPurchaseOrderExt.PurchaseOrderLineWrapper lineWrapper =
+            new FormPurchaseOrderExt.PurchaseOrderLineWrapper();
+
+        System.assertEquals(null, lineWrapper.partNameDisplay);
+
+        lineWrapper.partName = 'BRK-1';
+        System.assertEquals('BRK-1', lineWrapper.partNameDisplay);
+
+        lineWrapper.partName = 'OEM:N1040427506MTR';
+        System.assertEquals(true, lineWrapper.partNameDisplay.contains(zeroWidthSpace));
+    }
+
+    @IsTest
+    static void applyVendorAddressFallsBackToPoHeaderWithoutVendorAccount() {
+        FormPurchaseOrderExt extension = new FormPurchaseOrderExt(
+            new ApexPages.StandardController(new dealer__Purchase_Order__c())
+        );
+
+        extension.applyVendorAddress(
+            new dealer__Purchase_Order__c(
+                dealer__Vendor_Street__c = '1 Header St',
+                dealer__Vendor_City__c = 'Redding',
+                dealer__Vendor_State__c = 'CA',
+                dealer__Vendor_Postal_Code__c = '96001'
+            )
+        );
+
+        System.assertEquals('1 Header St', extension.vendorStreet);
+        System.assertEquals('Redding', extension.vendorCity);
+        System.assertEquals('CA', extension.vendorState);
+        System.assertEquals('96001', extension.vendorPostalCode);
+    }
+
+    @IsTest
+    static void applyVendorAddressUsesVendorAccountWhenAvailable() {
+        Account vendor = createVendorAccount();
+        vendor.BillingStreet = '9 Account Way';
+        vendor.BillingCity = 'Palo Alto';
+        vendor.BillingState = 'CA';
+        vendor.BillingPostalCode = '94301';
+        update vendor;
+
+        FormPurchaseOrderExt extension = new FormPurchaseOrderExt(
+            new ApexPages.StandardController(new dealer__Purchase_Order__c())
+        );
+
+        extension.applyVendorAddress(
+            new dealer__Purchase_Order__c(
+                dealer__Vendor__c = vendor.Id,
+                dealer__Vendor_Street__c = '1 Header St',
+                dealer__Vendor_City__c = 'Redding',
+                dealer__Vendor_State__c = 'CA',
+                dealer__Vendor_Postal_Code__c = '96001'
+            )
+        );
+
+        System.assertEquals('9 Account Way', extension.vendorStreet);
+        System.assertEquals('Palo Alto', extension.vendorCity);
+        System.assertEquals('CA', extension.vendorState);
+        System.assertEquals('94301', extension.vendorPostalCode);
+    }
+
+    @IsTest
+    static void applyVendorAddressKeepsHeaderWhenAccountHasNoAddress() {
+        Account vendor = createVendorAccount();
+
+        FormPurchaseOrderExt extension = new FormPurchaseOrderExt(
+            new ApexPages.StandardController(new dealer__Purchase_Order__c())
+        );
+
+        extension.applyVendorAddress(
+            new dealer__Purchase_Order__c(
+                dealer__Vendor__c = vendor.Id,
+                dealer__Vendor_Street__c = '1 Header St',
+                dealer__Vendor_City__c = 'Redding'
+            )
+        );
+
+        System.assertEquals('1 Header St', extension.vendorStreet);
+        System.assertEquals('Redding', extension.vendorCity);
+    }
+
+    @IsTest
     static void resolvePurchaseOrderIdUsesControllerRecordId() {
         dealer__Purchase_Order__c purchaseOrder = createPurchaseOrder();
 

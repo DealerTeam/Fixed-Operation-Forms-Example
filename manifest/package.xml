@@ -9,8 +9,8 @@
         <members>FormPurchaseOrderExtTest</members>
         <members>FormPartsInvoiceExt</members>
         <members>FormPartsInvoiceExtTest</members>
-        <members>FormPartsInvoiceAuditCopyExt</members>
-        <members>FormPartsInvoiceAuditCopyTest</members>
+        <members>FormPartsInvoiceAccountingCopyExt</members>
+        <members>FormPartsInvoiceAccountingCopyTest</members>
         <members>FormServiceRepairOrderAuditCopyExt</members>
         <members>FormServiceRepairOrderAuditCopyTest</members>
         <members>FormServiceRepairOrderCustomerCopyExt</members>
@@ -22,7 +22,7 @@
     <types>
         <members>form_ServiceTechnicianHardCard</members>
         <members>form_PartsInvoiceCopy</members>
-        <members>form_PartsInvoiceAuditCopy</members>
+        <members>form_PartsInvoiceAccountingCopy</members>
         <members>form_PartsPickTicketCopy</members>
         <members>form_PurchaseOrderVendorCopy</members>
         <members>form_PurchaseOrderAccountingCopy</members>
