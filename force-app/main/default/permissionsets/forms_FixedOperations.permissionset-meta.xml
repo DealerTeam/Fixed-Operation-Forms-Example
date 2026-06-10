@@ -939,10 +939,6 @@
         <enabled>true</enabled>
     </pageAccesses>
     <pageAccesses>
-        <apexPage>form_PurchaseOrder</apexPage>
-        <enabled>true</enabled>
-    </pageAccesses>
-    <pageAccesses>
         <apexPage>form_PurchaseOrderAccountingCopy</apexPage>
         <enabled>true</enabled>
     </pageAccesses>

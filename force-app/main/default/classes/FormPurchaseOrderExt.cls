@@ -43,6 +43,21 @@ public with sharing class FormPurchaseOrderExt {
     public String vendorState { get; private set; }
     public String vendorPostalCode { get; private set; }
 
+    public String vendorCopyFormTitle {
+        get {
+            return resolveVendorCopyFormTitle();
+        }
+    }
+
+    public String recordTypeLabel {
+        get {
+            if (po == null || po.RecordType == null) {
+                return null;
+            }
+            return po.RecordType.Name;
+        }
+    }
+
     public dealer__Dealer_Location__c dlr {
         get {
             if (po == null || po.dealer__Company__c == null) {
@@ -144,6 +159,7 @@ public with sharing class FormPurchaseOrderExt {
                 Name,
                 Id,
                 RecordType.DeveloperName,
+                RecordType.Name,
                 dealer__Type__c,
                 CreatedDate,
                 CreatedBy.Name,
@@ -229,6 +245,12 @@ public with sharing class FormPurchaseOrderExt {
         vendorCity = details.city;
         vendorState = details.state;
         vendorPostalCode = details.postalCode;
+    }
+
+    @TestVisible
+    private static String resolveVendorCopyFormTitle() {
+        return Schema.SObjectType.dealer__Purchase_Order__c.getLabel() +
+            ' - Vendor Copy';
     }
 
     @TestVisible

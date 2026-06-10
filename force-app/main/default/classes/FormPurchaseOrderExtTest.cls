@@ -761,6 +761,44 @@ private class FormPurchaseOrderExtTest {
     }
 
     @IsTest
+    static void vendorCopyFormTitleUsesPurchaseOrderSchemaLabel() {
+        String expectedTitle =
+            Schema.SObjectType.dealer__Purchase_Order__c.getLabel() +
+            ' - Vendor Copy';
+
+        System.assertEquals(
+            expectedTitle,
+            FormPurchaseOrderExt.resolveVendorCopyFormTitle()
+        );
+
+        FormPurchaseOrderExt extension = new FormPurchaseOrderExt(
+            new ApexPages.StandardController(new dealer__Purchase_Order__c())
+        );
+        System.assertEquals(expectedTitle, extension.vendorCopyFormTitle);
+    }
+
+    @IsTest
+    static void recordTypeLabelUsesRecordTypeNameFromSchema() {
+        Id partsPurchaseRecordTypeId = getPurchaseOrderRecordTypeId(
+            'Parts_Purchase'
+        );
+        String expectedRecordTypeName = Schema.SObjectType.dealer__Purchase_Order__c
+            .getRecordTypeInfosById()
+            .get(partsPurchaseRecordTypeId)
+            .getName();
+        dealer__Purchase_Order__c purchaseOrder = createPurchaseOrder(
+            null,
+            partsPurchaseRecordTypeId
+        );
+
+        FormPurchaseOrderExt extension = new FormPurchaseOrderExt(
+            new ApexPages.StandardController(purchaseOrder)
+        );
+
+        System.assertEquals(expectedRecordTypeName, extension.recordTypeLabel);
+    }
+
+    @IsTest
     static void extensionFlagsPartPurchaseRecordType() {
         dealer__Purchase_Order__c partsOrder = createPurchaseOrder();
         FormPurchaseOrderExt partsExtension = new FormPurchaseOrderExt(
